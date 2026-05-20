@@ -24,5 +24,17 @@ export const userRepository = {
         const result = await pool.query(query, values)
 
         return result.rows[0]
+    },
+
+    async findByTelegramId(telegramId) {
+        const query = `
+        SELECT *
+        FROM users
+        WHERE telegram_id = $1
+    `
+
+        const result = await pool.query(query, [telegramId])
+
+        return result.rows[0]
     }
 }
