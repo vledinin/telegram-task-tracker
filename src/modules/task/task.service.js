@@ -6,5 +6,16 @@ export const taskService = {
             userId,
             title,
         })
+    },
+
+    async getUserTasks(userId) {
+        return await taskRepository.getUserTasks(userId)
+    },
+
+    async markTaskDone(taskId, userId) {
+        return await taskRepository.markTaskDone(
+            taskId,
+            userId
+        )
     }
 }
