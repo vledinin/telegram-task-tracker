@@ -79,4 +79,35 @@ export function registerTaskModule(bot) {
 
         await ctx.reply(`Task completed: ${task.title}`)
     })
+
+    bot.command('delete', async (ctx) => {
+        const telegramId = ctx.from.id
+
+        const user = await userRepository.findByTelegramId(telegramId)
+
+        if (!user) {
+            return ctx.reply('User not found')
+        }
+
+        const taskId = ctx.message.text
+            .replace('/delete', '')
+            .trim()
+
+        if (!taskId) {
+            return ctx.reply('Provide task id')
+        }
+
+        const deletedTask = await taskService.deleteTask(
+            Number(taskId),
+            user.id
+        )
+
+        if (!deletedTask) {
+            return ctx.reply('Task not found')
+        }
+
+        await ctx.reply(
+            `Task deleted: ${deletedTask.title}`
+        )
+    })
 }
