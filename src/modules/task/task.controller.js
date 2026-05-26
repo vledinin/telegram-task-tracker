@@ -1,5 +1,6 @@
 import { taskService } from './task.service.js'
 import { userRepository } from '../user/user.repository.js'
+import { Markup } from 'telegraf'
 
 export function registerTaskModule(bot) {
     bot.command('addtask', async (ctx) => {
@@ -40,15 +41,26 @@ export function registerTaskModule(bot) {
             return ctx.reply('You have no tasks')
         }
 
-        const message = tasks
-            .map((task) => {
-                const status = task.is_done ? '✅' : '❌'
+        for (const task of tasks) {
+            const status = task.is_done ? '✅' : '❌'
 
-                return `${status} ${task.id}. ${task.title}`
-            })
-            .join('\n')
+            await ctx.reply(
+                `${status} ${task.title}`,
+                Markup.inlineKeyboard([
+                    [
+                        Markup.button.callback(
+                            '✅ Done',
+                            `done_${task.id}`
+                        ),
 
-        await ctx.reply(message)
+                        Markup.button.callback(
+                            '🗑 Delete',
+                            `delete_${task.id}`
+                        ),
+                    ],
+                ])
+            )
+        }
     })
 
     bot.command('done', async (ctx) => {
@@ -109,5 +121,61 @@ export function registerTaskModule(bot) {
         await ctx.reply(
             `Task deleted: ${deletedTask.title}`
         )
+    })
+
+    bot.action(/done_(.+)/, async (ctx) => {
+        const taskId = Number(ctx.match[1])
+
+        const telegramId = ctx.from.id
+
+        const user = await userRepository.findByTelegramId(
+            telegramId
+        )
+
+        if (!user) {
+            return ctx.answerCbQuery('User not found')
+        }
+
+        const task = await taskService.markTaskDone(
+            taskId,
+            user.id
+        )
+
+        if (!task) {
+            return ctx.answerCbQuery('Task not found')
+        }
+
+        await ctx.answerCbQuery('Task completed')
+
+        await ctx.editMessageText(
+            `✅ ${task.title}`
+        )
+    })
+
+    bot.action(/delete_(.+)/, async (ctx) => {
+        const taskId = Number(ctx.match[1])
+
+        const telegramId = ctx.from.id
+
+        const user = await userRepository.findByTelegramId(
+            telegramId
+        )
+
+        if (!user) {
+            return ctx.answerCbQuery('User not found')
+        }
+
+        const deletedTask = await taskService.deleteTask(
+            taskId,
+            user.id
+        )
+
+        if (!deletedTask) {
+            return ctx.answerCbQuery('Task not found')
+        }
+
+        await ctx.answerCbQuery('Task deleted')
+
+        await ctx.deleteMessage()
     })
 }
