@@ -1,6 +1,9 @@
 import { taskService } from './task.service.js'
 import { userRepository } from '../user/user.repository.js'
-import { Markup } from 'telegraf'
+import {
+    buildTasksMessage,
+    buildTasksKeyboard,
+} from '../../utils/task.utils.js'
 
 export function registerTaskModule(bot) {
     bot.command('addtask', async (ctx) => {
@@ -29,38 +32,33 @@ export function registerTaskModule(bot) {
     bot.command('tasks', async (ctx) => {
         const telegramId = ctx.from.id
 
-        const user = await userRepository.findByTelegramId(telegramId)
+        const user = await userRepository.findByTelegramId(
+            telegramId
+        )
 
         if (!user) {
             return ctx.reply('User not found')
         }
 
-        const tasks = await taskService.getUserTasks(user.id)
+        const page = 1
+
+        const tasks = await taskService.getUserTasks(
+            user.id,
+            page
+        )
 
         if (!tasks.length) {
             return ctx.reply('You have no tasks')
         }
 
-        for (const task of tasks) {
-            const status = task.is_done ? '✅' : '❌'
+        const message = buildTasksMessage(tasks, page)
 
-            await ctx.reply(
-                `${status} ${task.title}`,
-                Markup.inlineKeyboard([
-                    [
-                        Markup.button.callback(
-                            '✅ Done',
-                            `done_${task.id}`
-                        ),
+        const keyboard = buildTasksKeyboard(tasks, page)
 
-                        Markup.button.callback(
-                            '🗑 Delete',
-                            `delete_${task.id}`
-                        ),
-                    ],
-                ])
-            )
-        }
+        await ctx.reply(
+            message,
+            keyboard
+        )
     })
 
     bot.command('done', async (ctx) => {
@@ -177,5 +175,51 @@ export function registerTaskModule(bot) {
         await ctx.answerCbQuery('Task deleted')
 
         await ctx.deleteMessage()
+    })
+
+    bot.action(/tasks_page_(.+)/, async (ctx) => {
+        const page = Number(ctx.match[1])
+
+        if (page < 1) {
+            return ctx.answerCbQuery('Invalid page')
+        }
+
+        const telegramId = ctx.from.id
+
+        const user = await userRepository.findByTelegramId(
+            telegramId
+        )
+
+        if (!user) {
+            return ctx.answerCbQuery('User not found')
+        }
+
+        const tasks = await taskService.getUserTasks(
+            user.id,
+            page
+        )
+
+        if (!tasks.length) {
+            return ctx.answerCbQuery('No more tasks')
+        }
+
+        const message = buildTasksMessage(
+            tasks,
+            page
+        )
+
+        const keyboard = buildTasksKeyboard(
+            tasks,
+            page
+        )
+
+        await ctx.editMessageText(
+            message,
+            keyboard
+        )
+    })
+
+    bot.action('current_page', async (ctx) => {
+        await ctx.answerCbQuery()
     })
 }

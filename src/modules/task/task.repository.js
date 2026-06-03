@@ -20,15 +20,19 @@ export const taskRepository = {
         return result.rows[0]
     },
 
-    async getUserTasks(userId) {
+    async getUserTasks(userId, limit, offset) {
         const query = `
         SELECT *
         FROM tasks
         WHERE user_id = $1
         ORDER BY created_at DESC
+        LIMIT $2
+        OFFSET $3
     `
 
-        const result = await pool.query(query, [userId])
+        const values = [userId, limit, offset]
+
+        const result = await pool.query(query, values)
 
         return result.rows
     },
