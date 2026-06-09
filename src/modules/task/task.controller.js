@@ -56,7 +56,7 @@ export function registerTaskModule(bot) {
 
         const message = buildTasksMessage(tasks, page, filter)
 
-        const keyboard = buildTasksKeyboard(tasks, page)
+        const keyboard = buildTasksKeyboard(tasks, page, filter)
 
         await ctx.reply(
             message,
@@ -180,14 +180,14 @@ export function registerTaskModule(bot) {
         await ctx.deleteMessage()
     })
 
-    bot.action(/tasks_page_(.+)/, async (ctx) => {
+    bot.action(/tasks_page_(\d+)_(all|active|done)/, async (ctx) => {
         const page = Number(ctx.match[1])
+
+        const filter = ctx.match[2]
 
         if (page < 1) {
             return ctx.answerCbQuery('Invalid page')
         }
-
-        const filter = 'all'
 
         const telegramId = ctx.from.id
 
@@ -217,7 +217,8 @@ export function registerTaskModule(bot) {
 
         const keyboard = buildTasksKeyboard(
             tasks,
-            page
+            page,
+            filter
         )
 
         await ctx.editMessageText(
@@ -225,6 +226,58 @@ export function registerTaskModule(bot) {
             keyboard
         )
     })
+
+    bot.action(/filter_(all|active|done)/, async (ctx) => {
+            const filter = ctx.match[1]
+
+            const telegramId = ctx.from.id
+
+            const user =
+                await userRepository.findByTelegramId(
+                    telegramId
+                )
+
+            if (!user) {
+                return ctx.answerCbQuery(
+                    'User not found'
+                )
+            }
+
+            const page = 1
+
+            const tasks =
+                await taskService.getUserTasks(
+                    user.id,
+                    page,
+                    filter
+                )
+
+            if (!tasks.length) {
+                return ctx.answerCbQuery(
+                    'No tasks found'
+                )
+            }
+
+            const message =
+                buildTasksMessage(
+                    tasks,
+                    page,
+                    filter
+                )
+
+            const keyboard =
+                buildTasksKeyboard(
+                    tasks,
+                    page,
+                    filter
+                )
+
+            await ctx.editMessageText(
+                message,
+                keyboard
+            )
+        }
+    )
 
     bot.action('current_page', async (ctx) => {
         await ctx.answerCbQuery()

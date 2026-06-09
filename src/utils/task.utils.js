@@ -18,8 +18,35 @@ export function buildTasksMessage(
     return message
 }
 
-export function buildTasksKeyboard(tasks, page) {
+export function buildTasksKeyboard(
+    tasks,
+    page,
+    filter = 'all'
+) {
     const keyboard = []
+
+    keyboard.push([
+        Markup.button.callback(
+            filter === 'all'
+                ? '✅ All'
+                : 'All',
+            'filter_all'
+        ),
+
+        Markup.button.callback(
+            filter === 'active'
+                ? '✅ Active'
+                : 'Active',
+            'filter_active'
+        ),
+
+        Markup.button.callback(
+            filter === 'done'
+                ? '✅ Done'
+                : 'Done',
+            'filter_done'
+        ),
+    ])
 
     for (const task of tasks) {
         keyboard.push([
@@ -38,7 +65,7 @@ export function buildTasksKeyboard(tasks, page) {
     keyboard.push([
         Markup.button.callback(
             '⬅ Prev',
-            `tasks_page_${page - 1}`
+            `tasks_page_${page - 1}_${filter}`,
         ),
 
         Markup.button.callback(
@@ -48,7 +75,7 @@ export function buildTasksKeyboard(tasks, page) {
 
         Markup.button.callback(
             'Next ➡',
-            `tasks_page_${page + 1}`
+            `tasks_page_${page + 1}_${filter}`,
         ),
     ])
 
