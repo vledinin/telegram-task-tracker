@@ -1,7 +1,13 @@
 import { Markup } from 'telegraf'
 
-export function buildTasksMessage(tasks, page) {
-    let message = `📄 Tasks — Page ${page}\n\n`
+export function buildTasksMessage(
+    tasks,
+    page,
+    filter
+){
+    let message =
+        `📄 Tasks — Page ${page}\n` +
+        `Filter: ${filter}\n\n`
 
     for (const task of tasks) {
         const status = task.is_done ? '✅' : '❌'

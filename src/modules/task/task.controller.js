@@ -42,16 +42,19 @@ export function registerTaskModule(bot) {
 
         const page = 1
 
+        const filter = 'all'
+
         const tasks = await taskService.getUserTasks(
             user.id,
-            page
+            page,
+            filter
         )
 
         if (!tasks.length) {
             return ctx.reply('You have no tasks')
         }
 
-        const message = buildTasksMessage(tasks, page)
+        const message = buildTasksMessage(tasks, page, filter)
 
         const keyboard = buildTasksKeyboard(tasks, page)
 
@@ -184,6 +187,8 @@ export function registerTaskModule(bot) {
             return ctx.answerCbQuery('Invalid page')
         }
 
+        const filter = 'all'
+
         const telegramId = ctx.from.id
 
         const user = await userRepository.findByTelegramId(
@@ -196,7 +201,8 @@ export function registerTaskModule(bot) {
 
         const tasks = await taskService.getUserTasks(
             user.id,
-            page
+            page,
+            filter
         )
 
         if (!tasks.length) {
@@ -205,7 +211,8 @@ export function registerTaskModule(bot) {
 
         const message = buildTasksMessage(
             tasks,
-            page
+            page,
+            filter
         )
 
         const keyboard = buildTasksKeyboard(

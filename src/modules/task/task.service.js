@@ -8,7 +8,11 @@ export const taskService = {
         })
     },
 
-    async getUserTasks(userId, page = 1) {
+    async getUserTasks(
+        userId,
+        page = 1,
+        filter = 'all'
+    ) {
         const limit = 5
 
         const offset = (page - 1) * limit
@@ -16,7 +20,8 @@ export const taskService = {
         return await taskRepository.getUserTasks(
             userId,
             limit,
-            offset
+            offset,
+            filter
         )
     },
 

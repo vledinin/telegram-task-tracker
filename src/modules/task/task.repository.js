@@ -20,15 +20,29 @@ export const taskRepository = {
         return result.rows[0]
     },
 
-    async getUserTasks(userId, limit, offset) {
-        const query = `
-        SELECT *
-        FROM tasks
-        WHERE user_id = $1
-        ORDER BY created_at DESC
-        LIMIT $2
-        OFFSET $3
-    `
+    async getUserTasks(
+        userId,
+        limit,
+        offset,
+        filter = 'all'
+    ) {
+        let query = `
+            SELECT *
+            FROM tasks
+            WHERE user_id = $1
+        `
+        if (filter === 'active') {
+            query += ' AND is_done = false'
+        }
+
+        if (filter === 'done') {
+            query += ' AND is_done = true'
+        }
+        query += `
+            ORDER BY created_at DESC
+            LIMIT $2
+            OFFSET $3
+        `
 
         const values = [userId, limit, offset]
 
