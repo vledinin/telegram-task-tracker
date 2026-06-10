@@ -44,19 +44,35 @@ export function registerTaskModule(bot) {
 
         const filter = 'all'
 
-        const tasks = await taskService.getUserTasks(
+        const result = await taskService.getUserTasks(
             user.id,
             page,
             filter
         )
 
+        const {
+            tasks,
+            totalPages,
+            currentPage,
+        } = result
+
         if (!tasks.length) {
             return ctx.reply('You have no tasks')
         }
 
-        const message = buildTasksMessage(tasks, page, filter)
+        const message = buildTasksMessage(
+            tasks,
+            currentPage,
+            totalPages,
+            filter
+        )
 
-        const keyboard = buildTasksKeyboard(tasks, page, filter)
+        const keyboard = buildTasksKeyboard(
+            tasks,
+            currentPage,
+            totalPages,
+            filter
+        )
 
         await ctx.reply(
             message,
@@ -199,27 +215,38 @@ export function registerTaskModule(bot) {
             return ctx.answerCbQuery('User not found')
         }
 
-        const tasks = await taskService.getUserTasks(
-            user.id,
-            page,
-            filter
-        )
+        const result =
+            await taskService.getUserTasks(
+                user.id,
+                page,
+                filter
+            )
+
+        const {
+            tasks,
+            totalPages,
+            currentPage,
+        } = result
 
         if (!tasks.length) {
             return ctx.answerCbQuery('No more tasks')
         }
 
-        const message = buildTasksMessage(
-            tasks,
-            page,
-            filter
-        )
+        const message =
+            buildTasksMessage(
+                tasks,
+                currentPage,
+                totalPages,
+                filter
+            )
 
-        const keyboard = buildTasksKeyboard(
-            tasks,
-            page,
-            filter
-        )
+        const keyboard =
+            buildTasksKeyboard(
+                tasks,
+                currentPage,
+                totalPages,
+                filter
+            )
 
         await ctx.editMessageText(
             message,
@@ -228,56 +255,63 @@ export function registerTaskModule(bot) {
     })
 
     bot.action(/filter_(all|active|done)/, async (ctx) => {
-            const filter = ctx.match[1]
+        const filter = ctx.match[1]
 
-            const telegramId = ctx.from.id
+        const telegramId = ctx.from.id
 
-            const user =
-                await userRepository.findByTelegramId(
-                    telegramId
-                )
+        const user =
+            await userRepository.findByTelegramId(
+                telegramId
+            )
 
-            if (!user) {
-                return ctx.answerCbQuery(
-                    'User not found'
-                )
-            }
-
-            const page = 1
-
-            const tasks =
-                await taskService.getUserTasks(
-                    user.id,
-                    page,
-                    filter
-                )
-
-            if (!tasks.length) {
-                return ctx.answerCbQuery(
-                    'No tasks found'
-                )
-            }
-
-            const message =
-                buildTasksMessage(
-                    tasks,
-                    page,
-                    filter
-                )
-
-            const keyboard =
-                buildTasksKeyboard(
-                    tasks,
-                    page,
-                    filter
-                )
-
-            await ctx.editMessageText(
-                message,
-                keyboard
+        if (!user) {
+            return ctx.answerCbQuery(
+                'User not found'
             )
         }
-    )
+
+        const page = 1
+
+        const result =
+            await taskService.getUserTasks(
+                user.id,
+                page,
+                filter
+            )
+
+        const {
+            tasks,
+            totalPages,
+            currentPage,
+        } = result
+
+        if (!tasks.length) {
+            return ctx.answerCbQuery(
+                'No tasks found'
+            )
+        }
+
+        const message =
+            buildTasksMessage(
+                tasks,
+                currentPage,
+                totalPages,
+                filter
+            )
+
+        const keyboard =
+            buildTasksKeyboard(
+                tasks,
+                currentPage,
+                totalPages,
+                filter
+            )
+
+        await ctx.editMessageText(
+            message,
+            keyboard
+        )
+    })
 
     bot.action('current_page', async (ctx) => {
         await ctx.answerCbQuery()

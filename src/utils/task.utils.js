@@ -2,11 +2,12 @@ import { Markup } from 'telegraf'
 
 export function buildTasksMessage(
     tasks,
-    page,
+    currentPage,
+    totalPages,
     filter
-){
+) {
     let message =
-        `📄 Tasks — Page ${page}\n` +
+        `📄 Tasks — Page ${currentPage}/${totalPages}\n` +
         `Filter: ${filter}\n\n`
 
     for (const task of tasks) {
@@ -20,7 +21,8 @@ export function buildTasksMessage(
 
 export function buildTasksKeyboard(
     tasks,
-    page,
+    currentPage,
+    totalPages,
     filter = 'all'
 ) {
     const keyboard = []
@@ -62,22 +64,34 @@ export function buildTasksKeyboard(
         ])
     }
 
-    keyboard.push([
-        Markup.button.callback(
-            '⬅ Prev',
-            `tasks_page_${page - 1}_${filter}`,
-        ),
+    const paginationRow = []
 
+    if (currentPage > 1) {
+        paginationRow.push(
+            Markup.button.callback(
+                '⬅ Prev',
+                `tasks_page_${currentPage - 1}_${filter}`
+            )
+        )
+    }
+
+    paginationRow.push(
         Markup.button.callback(
-            `📄 ${page}`,
+            `📄 ${currentPage}/${totalPages}`,
             'current_page'
-        ),
+        )
+    )
 
-        Markup.button.callback(
-            'Next ➡',
-            `tasks_page_${page + 1}_${filter}`,
-        ),
-    ])
+    if (currentPage < totalPages) {
+        paginationRow.push(
+            Markup.button.callback(
+                'Next ➡',
+                `tasks_page_${currentPage + 1}_${filter}`
+            )
+        )
+    }
+
+    keyboard.push(paginationRow)
 
     return Markup.inlineKeyboard(keyboard)
 }

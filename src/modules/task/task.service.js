@@ -15,14 +15,34 @@ export const taskService = {
     ) {
         const limit = 5
 
-        const offset = (page - 1) * limit
+        const offset =
+            (page - 1) * limit
 
-        return await taskRepository.getUserTasks(
-            userId,
-            limit,
-            offset,
-            filter
-        )
+        const tasks =
+            await taskRepository.getUserTasks(
+                userId,
+                limit,
+                offset,
+                filter
+            )
+
+        const totalTasks =
+            await taskRepository.countUserTasks(
+                userId,
+                filter
+            )
+
+        const totalPages =
+            Math.ceil(
+                totalTasks / limit
+            )
+
+        return {
+            tasks,
+            totalTasks,
+            totalPages,
+            currentPage: page,
+        }
     },
 
     async markTaskDone(taskId, userId) {

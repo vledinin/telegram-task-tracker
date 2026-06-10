@@ -51,6 +51,34 @@ export const taskRepository = {
         return result.rows
     },
 
+    async countUserTasks(
+        userId,
+        filter = 'all'
+    ) {
+        let query = `
+        SELECT COUNT(*)
+        FROM tasks
+        WHERE user_id = $1
+    `
+
+        if (filter === 'active') {
+            query += ' AND is_done = false'
+        }
+
+        if (filter === 'done') {
+            query += ' AND is_done = true'
+        }
+
+        const result = await pool.query(
+            query,
+            [userId]
+        )
+
+        return Number(
+            result.rows[0].count
+        )
+    },
+
     async markTaskDone(taskId, userId) {
         const query = `
         UPDATE tasks
