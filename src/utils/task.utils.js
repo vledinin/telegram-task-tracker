@@ -58,6 +58,11 @@ export function buildTasksKeyboard(
             ),
 
             Markup.button.callback(
+                `✏ Edit ${task.id}`,
+                `edit_${task.id}`
+            ),
+
+            Markup.button.callback(
                 `🗑 Delete ${task.id}`,
                 `delete_${task.id}`
             ),

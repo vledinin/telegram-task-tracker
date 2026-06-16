@@ -108,5 +108,32 @@ export const taskRepository = {
         const result = await pool.query(query, values)
 
         return result.rows[0]
+    },
+
+    async updateTaskTitle(
+        taskId,
+        userId,
+        title
+    ) {
+        const query = `
+        UPDATE tasks
+        SET title = $3
+        WHERE id = $1
+          AND user_id = $2
+        RETURNING *
+    `
+
+        const values = [
+            taskId,
+            userId,
+            title,
+        ]
+
+        const result = await pool.query(
+            query,
+            values
+        )
+
+        return result.rows[0]
     }
 }

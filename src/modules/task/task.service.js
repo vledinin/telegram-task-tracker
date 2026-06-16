@@ -57,5 +57,17 @@ export const taskService = {
             taskId,
             userId
         )
+    },
+
+    async updateTaskTitle(
+        taskId,
+        userId,
+        title
+    ) {
+        return await taskRepository.updateTaskTitle(
+            taskId,
+            userId,
+            title
+        )
     }
 }

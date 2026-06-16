@@ -4,6 +4,7 @@ import {
     buildTasksMessage,
     buildTasksKeyboard,
 } from '../../utils/task.utils.js'
+import { editSessions } from '../../state/edit.session.js'
 
 export function registerTaskModule(bot) {
     bot.command('addtask', async (ctx) => {
@@ -31,6 +32,8 @@ export function registerTaskModule(bot) {
 
     bot.command('tasks', async (ctx) => {
         const telegramId = ctx.from.id
+
+        editSessions.delete(telegramId)
 
         const user = await userRepository.findByTelegramId(
             telegramId
@@ -196,6 +199,23 @@ export function registerTaskModule(bot) {
         await ctx.deleteMessage()
     })
 
+    bot.action(/edit_(.+)/, async (ctx) => {
+        const taskId = Number(ctx.match[1])
+
+        const telegramId = ctx.from.id
+
+        editSessions.set(
+            telegramId,
+            taskId
+        )
+
+        await ctx.answerCbQuery()
+
+        await ctx.reply(
+            'Send new task title'
+        )
+    })
+
     bot.action(/tasks_page_(\d+)_(all|active|done)/, async (ctx) => {
         const page = Number(ctx.match[1])
 
@@ -310,6 +330,64 @@ export function registerTaskModule(bot) {
         await ctx.editMessageText(
             message,
             keyboard
+        )
+    })
+
+    bot.on('text', async (ctx) => {
+        const telegramId = ctx.from.id
+
+        if (
+            !editSessions.has(
+                telegramId
+            )
+        ) {
+            return
+        }
+
+        const taskId =
+            editSessions.get(
+                telegramId
+            )
+
+        const user =
+            await userRepository.findByTelegramId(
+                telegramId
+            )
+
+        if (!user) {
+            return ctx.reply(
+                'User not found'
+            )
+        }
+
+        const newTitle =
+            ctx.message.text.trim()
+
+        if (!newTitle) {
+            return ctx.reply(
+                'Task title cannot be empty'
+            )
+        }
+
+        const updatedTask =
+            await taskService.updateTaskTitle(
+                taskId,
+                user.id,
+                newTitle
+            )
+
+        editSessions.delete(
+            telegramId
+        )
+
+        if (!updatedTask) {
+            return ctx.reply(
+                'Task not found'
+            )
+        }
+
+        await ctx.reply(
+            `Task updated: ${updatedTask.title}`
         )
     })
 
