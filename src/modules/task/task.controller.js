@@ -16,16 +16,42 @@ export function registerTaskModule(bot) {
             return ctx.reply('User not found')
         }
 
-        const title = ctx.message.text.replace('/addtask', '').trim()
+        const taskText = ctx.message.text
+            .replace('/addtask', '')
+            .trim()
 
-        if (!title) {
-            return ctx.reply('Please provide task title')
+        if (!taskText) {
+            return ctx.reply(
+                'Please provide task title'
+            )
         }
 
-        const task = await taskService.createTask(
-            user.id,
-            title
-        )
+        const [titlePart, dueDatePart] =
+            taskText.split('|')
+
+        const title =
+            titlePart?.trim()
+
+        const dueDate =
+            dueDatePart?.trim() || null
+
+        if (
+            dueDate &&
+            Number.isNaN(
+                Date.parse(dueDate)
+            )
+        ) {
+            return ctx.reply(
+                'Invalid date format. Use YYYY-MM-DD'
+            )
+        }
+
+        const task =
+            await taskService.createTask(
+                user.id,
+                title,
+                dueDate
+            )
 
         await ctx.reply(`Task created: ${task.title}`)
     })

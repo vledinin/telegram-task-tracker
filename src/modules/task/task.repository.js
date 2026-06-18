@@ -2,18 +2,27 @@ import { pool } from '../../config/db.js'
 
 export const taskRepository = {
     async createTask(taskData) {
-        const { userId, title } = taskData
+        const {
+            userId,
+            title,
+            dueDate,
+        } = taskData
 
         const query = `
             INSERT INTO tasks (
                 user_id,
-                title
+                title,
+                due_date
             )
-            VALUES ($1, $2)
+            VALUES ($1, $2, $3)
             RETURNING *
         `
 
-        const values = [userId, title]
+        const values = [
+            userId,
+            title,
+            dueDate,
+        ]
 
         const result = await pool.query(query, values)
 

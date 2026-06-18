@@ -11,9 +11,33 @@ export function buildTasksMessage(
         `Filter: ${filter}\n\n`
 
     for (const task of tasks) {
-        const status = task.is_done ? '✅' : '❌'
+        const status =
+            task.is_done ? '✅' : '❌'
 
-        message += `${status} ${task.id}. ${task.title}\n\n`
+        const isOverdue =
+            !task.is_done &&
+            task.due_date &&
+            new Date(task.due_date) < new Date()
+
+        message +=
+            `${status} ${task.id}. ${task.title}\n`
+
+        if (task.due_date) {
+            const dueDate =
+                new Date(task.due_date)
+                    .toISOString()
+                    .split('T')[0]
+
+            if (isOverdue) {
+                message +=
+                    '⚠ OVERDUE\n'
+            }
+
+            message +=
+                `📅 ${dueDate}\n`
+        }
+
+        message += '\n'
     }
 
     return message
