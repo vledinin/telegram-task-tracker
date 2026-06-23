@@ -5,6 +5,7 @@ import {
     buildTasksKeyboard,
 } from '../../utils/task.utils.js'
 import { editSessions } from '../../state/edit.session.js'
+import { Markup } from 'telegraf'
 
 export function registerTaskModule(bot) {
     bot.command('addtask', async (ctx) => {
@@ -26,14 +27,22 @@ export function registerTaskModule(bot) {
             )
         }
 
-        const [titlePart, dueDatePart] =
-            taskText.split('|')
+        const [
+            titlePart,
+            dueDatePart,
+            priorityPart,
+        ] = taskText.split('|')
 
         const title =
             titlePart?.trim()
 
         const dueDate =
             dueDatePart?.trim() || null
+
+        const priority =
+            priorityPart?.trim()
+                .toLowerCase()
+            || 'medium'
 
         if (
             dueDate &&
@@ -46,11 +55,28 @@ export function registerTaskModule(bot) {
             )
         }
 
+        const allowedPriorities = [
+            'low',
+            'medium',
+            'high',
+        ]
+
+        if (
+            !allowedPriorities.includes(
+                priority
+            )
+        ) {
+            return ctx.reply(
+                'Priority must be low, medium or high'
+            )
+        }
+
         const task =
             await taskService.createTask(
                 user.id,
                 title,
-                dueDate
+                dueDate,
+                priority
             )
 
         await ctx.reply(`Task created: ${task.title}`)
@@ -241,6 +267,81 @@ export function registerTaskModule(bot) {
             'Send new task title'
         )
     })
+
+    bot.action(/^priority_(\d+)$/, async (ctx) => {
+        const taskId = Number(ctx.match[1])
+
+        await ctx.answerCbQuery()
+
+        await ctx.reply(
+            'Choose priority:',
+            Markup.inlineKeyboard([
+                [
+                    Markup.button.callback(
+                        '🔴 High',
+                        `set_priority_${taskId}_high`
+                    ),
+                ],
+                [
+                    Markup.button.callback(
+                        '🟡 Medium',
+                        `set_priority_${taskId}_medium`
+                    ),
+                ],
+                [
+                    Markup.button.callback(
+                        '🟢 Low',
+                        `set_priority_${taskId}_low`
+                    ),
+                ],
+            ])
+        )
+    })
+
+    bot.action(
+        /set_priority_(\d+)_(high|medium|low)/,
+        async (ctx) => {
+            const telegramId = ctx.from.id
+
+            const user =
+                await userRepository.findByTelegramId(
+                    telegramId
+                )
+
+            if (!user) {
+                return ctx.answerCbQuery(
+                    'User not found'
+                )
+            }
+
+            const taskId =
+                Number(ctx.match[1])
+
+            const priority =
+                ctx.match[2]
+
+            const updatedTask =
+                await taskService.updateTaskPriority(
+                    taskId,
+                    user.id,
+                    priority
+                )
+
+            if (!updatedTask) {
+                return ctx.answerCbQuery(
+                    'Task not found'
+                )
+            }
+
+            await ctx.answerCbQuery(
+                'Priority updated'
+            )
+
+            await ctx.reply(
+                `Priority changed to ${priority}`
+            )
+        }
+    )
 
     bot.action(/tasks_page_(\d+)_(all|active|done)/, async (ctx) => {
         const page = Number(ctx.match[1])

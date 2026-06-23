@@ -6,15 +6,17 @@ export const taskRepository = {
             userId,
             title,
             dueDate,
+            priority,
         } = taskData
 
         const query = `
             INSERT INTO tasks (
                 user_id,
                 title,
-                due_date
+                due_date,
+                priority
             )
-            VALUES ($1, $2, $3)
+            VALUES ($1, $2, $3, $4)
             RETURNING *
         `
 
@@ -22,6 +24,7 @@ export const taskRepository = {
             userId,
             title,
             dueDate,
+            priority
         ]
 
         const result = await pool.query(query, values)
@@ -48,7 +51,13 @@ export const taskRepository = {
             query += ' AND is_done = true'
         }
         query += `
-            ORDER BY created_at DESC
+            ORDER BY
+                CASE priority
+                    WHEN 'high' THEN 1
+                    WHEN 'medium' THEN 2
+                    WHEN 'low' THEN 3
+                END,
+                created_at DESC
             LIMIT $2
             OFFSET $3
         `
@@ -136,6 +145,33 @@ export const taskRepository = {
             taskId,
             userId,
             title,
+        ]
+
+        const result = await pool.query(
+            query,
+            values
+        )
+
+        return result.rows[0]
+    },
+
+    async updateTaskPriority(
+        taskId,
+        userId,
+        priority
+    ) {
+        const query = `
+        UPDATE tasks
+        SET priority = $3
+        WHERE id = $1
+          AND user_id = $2
+        RETURNING *
+    `
+
+        const values = [
+            taskId,
+            userId,
+            priority,
         ]
 
         const result = await pool.query(

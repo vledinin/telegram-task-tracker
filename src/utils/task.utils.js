@@ -19,8 +19,18 @@ export function buildTasksMessage(
             task.due_date &&
             new Date(task.due_date) < new Date()
 
+        let priorityIcon = '🟡'
+
+        if (task.priority === 'high') {
+            priorityIcon = '🔴'
+        }
+
+        if (task.priority === 'low') {
+            priorityIcon = '🟢'
+        }
+
         message +=
-            `${status} ${task.id}. ${task.title}\n`
+            `${priorityIcon} ${status} ${task.id}. ${task.title}\n`
 
         if (task.due_date) {
             const dueDate =
@@ -84,6 +94,11 @@ export function buildTasksKeyboard(
             Markup.button.callback(
                 `✏ Edit ${task.id}`,
                 `edit_${task.id}`
+            ),
+
+            Markup.button.callback(
+                `⭐ Priority`,
+                `priority_${task.id}`
             ),
 
             Markup.button.callback(
