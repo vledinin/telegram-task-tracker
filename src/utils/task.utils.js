@@ -56,9 +56,8 @@ export function buildTasksMessage(
 
         if (task.due_date) {
             const dueDate =
-                new Date(task.due_date)
-                    .toISOString()
-                    .split('T')[0]
+                task.due_date
+                    .toLocaleDateString('sv-SE')
 
             if (isOverdue) {
                 message +=
