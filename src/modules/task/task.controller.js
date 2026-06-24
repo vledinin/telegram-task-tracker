@@ -31,6 +31,7 @@ export function registerTaskModule(bot) {
             titlePart,
             dueDatePart,
             priorityPart,
+            categoryPart,
         ] = taskText.split('|')
 
         const title =
@@ -43,6 +44,11 @@ export function registerTaskModule(bot) {
             priorityPart?.trim()
                 .toLowerCase()
             || 'medium'
+
+        const category =
+            categoryPart?.trim()
+                .toLowerCase()
+            || 'other'
 
         if (
             dueDate &&
@@ -71,12 +77,32 @@ export function registerTaskModule(bot) {
             )
         }
 
+        const allowedCategories = [
+            'work',
+            'study',
+            'home',
+            'health',
+            'shopping',
+            'other',
+        ]
+
+        if (
+            !allowedCategories.includes(
+                category
+            )
+        ) {
+            return ctx.reply(
+                'Category must be work, study, home, health, shopping or other'
+            )
+        }
+
         const task =
             await taskService.createTask(
                 user.id,
                 title,
                 dueDate,
-                priority
+                priority,
+                category
             )
 
         await ctx.reply(`Task created: ${task.title}`)
@@ -339,6 +365,105 @@ export function registerTaskModule(bot) {
 
             await ctx.reply(
                 `Priority changed to ${priority}`
+            )
+        }
+    )
+
+    bot.action(
+        /^category_(\d+)$/,
+        async (ctx) => {
+
+            const taskId =
+                Number(ctx.match[1])
+
+            await ctx.answerCbQuery()
+
+            await ctx.reply(
+                'Choose category:',
+                Markup.inlineKeyboard([
+                    [
+                        Markup.button.callback(
+                            '💼 Work',
+                            `set_category_${taskId}_work`
+                        ),
+                    ],
+                    [
+                        Markup.button.callback(
+                            '📚 Study',
+                            `set_category_${taskId}_study`
+                        ),
+                    ],
+                    [
+                        Markup.button.callback(
+                            '🏠 Home',
+                            `set_category_${taskId}_home`
+                        ),
+                    ],
+                    [
+                        Markup.button.callback(
+                            '💪 Health',
+                            `set_category_${taskId}_health`
+                        ),
+                    ],
+                    [
+                        Markup.button.callback(
+                            '🛒 Shopping',
+                            `set_category_${taskId}_shopping`
+                        ),
+                    ],
+                    [
+                        Markup.button.callback(
+                            '📌 Other',
+                            `set_category_${taskId}_other`
+                        ),
+                    ],
+                ])
+            )
+        }
+    )
+
+    bot.action(
+        /^set_category_(\d+)_(.+)$/,
+        async (ctx) => {
+
+            const telegramId = ctx.from.id
+
+            const user =
+                await userRepository.findByTelegramId(
+                    telegramId
+                )
+
+            if (!user) {
+                return ctx.answerCbQuery(
+                    'User not found'
+                )
+            }
+
+            const taskId =
+                Number(ctx.match[1])
+
+            const category =
+                ctx.match[2]
+
+            const updatedTask =
+                await taskService.updateTaskCategory(
+                    taskId,
+                    user.id,
+                    category
+                )
+
+            if (!updatedTask) {
+                return ctx.answerCbQuery(
+                    'Task not found'
+                )
+            }
+
+            await ctx.answerCbQuery(
+                'Category updated'
+            )
+
+            await ctx.reply(
+                `Category changed to ${category}`
             )
         }
     )

@@ -5,13 +5,15 @@ export const taskService = {
         userId,
         title,
         dueDate = null,
-        priority = 'medium'
+        priority = 'medium',
+        category = 'other'
     ) {
         return await taskRepository.createTask({
             userId,
             title,
             dueDate,
             priority,
+            category,
         })
     },
 
@@ -87,6 +89,18 @@ export const taskService = {
             taskId,
             userId,
             priority
+        )
+    },
+
+    async updateTaskCategory(
+        taskId,
+        userId,
+        category
+    ) {
+        return await taskRepository.updateTaskCategory(
+            taskId,
+            userId,
+            category
         )
     }
 }

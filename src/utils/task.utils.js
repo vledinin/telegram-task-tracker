@@ -11,6 +11,28 @@ export function buildTasksMessage(
         `Filter: ${filter}\n\n`
 
     for (const task of tasks) {
+        let categoryIcon = '📌'
+
+        if (task.category === 'work') {
+            categoryIcon = '💼'
+        }
+
+        if (task.category === 'study') {
+            categoryIcon = '📚'
+        }
+
+        if (task.category === 'home') {
+            categoryIcon = '🏠'
+        }
+
+        if (task.category === 'health') {
+            categoryIcon = '💪'
+        }
+
+        if (task.category === 'shopping') {
+            categoryIcon = '🛒'
+        }
+
         const status =
             task.is_done ? '✅' : '❌'
 
@@ -30,7 +52,7 @@ export function buildTasksMessage(
         }
 
         message +=
-            `${priorityIcon} ${status} ${task.id}. ${task.title}\n`
+            `${categoryIcon} ${priorityIcon} ${status} ${task.id}. ${task.title}\n`
 
         if (task.due_date) {
             const dueDate =
@@ -87,8 +109,8 @@ export function buildTasksKeyboard(
     for (const task of tasks) {
         keyboard.push([
             Markup.button.callback(
-                `✅ Done ${task.id}`,
-                `done_${task.id}`
+                '⭐ Priority',
+                `priority_${task.id}`
             ),
 
             Markup.button.callback(
@@ -97,8 +119,15 @@ export function buildTasksKeyboard(
             ),
 
             Markup.button.callback(
-                `⭐ Priority`,
-                `priority_${task.id}`
+                '📂 Category',
+                `category_${task.id}`
+            ),
+        ])
+
+        keyboard.push([
+            Markup.button.callback(
+                `✅ Done ${task.id}`,
+                `done_${task.id}`
             ),
 
             Markup.button.callback(

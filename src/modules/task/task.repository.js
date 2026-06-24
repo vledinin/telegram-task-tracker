@@ -7,6 +7,7 @@ export const taskRepository = {
             title,
             dueDate,
             priority,
+            category,
         } = taskData
 
         const query = `
@@ -14,9 +15,10 @@ export const taskRepository = {
                 user_id,
                 title,
                 due_date,
-                priority
+                priority,
+                category
             )
-            VALUES ($1, $2, $3, $4)
+            VALUES ($1, $2, $3, $4, $5)
             RETURNING *
         `
 
@@ -24,7 +26,8 @@ export const taskRepository = {
             userId,
             title,
             dueDate,
-            priority
+            priority,
+            category,
         ]
 
         const result = await pool.query(query, values)
@@ -172,6 +175,33 @@ export const taskRepository = {
             taskId,
             userId,
             priority,
+        ]
+
+        const result = await pool.query(
+            query,
+            values
+        )
+
+        return result.rows[0]
+    },
+
+    async updateTaskCategory(
+        taskId,
+        userId,
+        category
+    ) {
+        const query = `
+        UPDATE tasks
+        SET category = $3
+        WHERE id = $1
+          AND user_id = $2
+        RETURNING *
+    `
+
+        const values = [
+            taskId,
+            userId,
+            category,
         ]
 
         const result = await pool.query(
