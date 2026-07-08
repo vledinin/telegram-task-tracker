@@ -1,344 +1,98 @@
-import { taskService } from './task.service.js'
-import { userRepository } from '../user/user.repository.js'
-import {
-    buildTasksMessage,
-    buildTasksKeyboard,
-} from '../../utils/task.utils.js'
-import { editSessions } from '../../state/edit.session.js'
-import { Markup } from 'telegraf'
+import {showTasks} from './handlers/showTasks.handler.js'
+import {handlePagination} from "./handlers/pagination.handler.js";
+import {handleFilter} from "./handlers/filter.handler.js";
+import {handleDoneByAction, handleDoneByCommand} from "./handlers/done.handler.js";
+import {handleDeleteByAction, handleDeleteByCommand} from "./handlers/delete.handler.js";
+import {handleEditByAction, handleEditByText} from "./handlers/edit.handler.js";
+import {handlePriorityByAction, handleSetPriorityByAction} from "./handlers/priority.handler.js";
+import {handleCategoryByAction, handleSetCategoryByAction} from "./handlers/category.handler.js";
+import {handleAddTask} from "./handlers/addTask.handler.js";
 
 export function registerTaskModule(bot) {
-    bot.command('addtask', async (ctx) => {
-        const telegramId = ctx.from.id
 
-        const user = await userRepository.findByTelegramId(telegramId)
+    // Commands
 
-        if (!user) {
-            return ctx.reply('User not found')
-        }
+    bot.command(
+        'addtask',
+        handleAddTask
+    )
 
-        const taskText = ctx.message.text
-            .replace('/addtask', '')
-            .trim()
-
-        if (!taskText) {
-            return ctx.reply(
-                'Please provide task title'
-            )
-        }
-
-        const [
-            titlePart,
-            dueDatePart,
-            priorityPart,
-            categoryPart,
-        ] = taskText.split('|')
-
-        const title =
-            titlePart?.trim()
-
-        const dueDate =
-            dueDatePart?.trim() || null
-
-        const priority =
-            priorityPart?.trim()
-                .toLowerCase()
-            || 'medium'
-
-        const category =
-            categoryPart?.trim()
-                .toLowerCase()
-            || 'other'
-
-        if (
-            dueDate &&
-            Number.isNaN(
-                Date.parse(dueDate)
-            )
-        ) {
-            return ctx.reply(
-                'Invalid date format. Use YYYY-MM-DD'
-            )
-        }
-
-        const allowedPriorities = [
-            'low',
-            'medium',
-            'high',
-        ]
-
-        if (
-            !allowedPriorities.includes(
-                priority
-            )
-        ) {
-            return ctx.reply(
-                'Priority must be low, medium or high'
-            )
-        }
-
-        const allowedCategories = [
-            'work',
-            'study',
-            'home',
-            'health',
-            'shopping',
-            'other',
-        ]
-
-        if (
-            !allowedCategories.includes(
-                category
-            )
-        ) {
-            return ctx.reply(
-                'Category must be work, study, home, health, shopping or other'
-            )
-        }
-
-        const task =
-            await taskService.createTask(
-                user.id,
-                title,
-                dueDate,
-                priority,
-                category
-            )
-
-        await ctx.reply(`Task created: ${task.title}`)
+    bot.command('tasks',
+        async (ctx) => {
+        await showTasks(ctx)
     })
 
-    bot.command('tasks', async (ctx) => {
-        const telegramId = ctx.from.id
+    bot.command(
+        'done',
+        handleDoneByCommand
+    )
 
-        editSessions.delete(telegramId)
+    bot.command(
+        'delete',
+        handleDeleteByCommand
+    )
 
-        const user = await userRepository.findByTelegramId(
-            telegramId
-        )
+    // Task actions
 
-        if (!user) {
-            return ctx.reply('User not found')
+    bot.action(
+        /done_(.+)/,
+        async (ctx) => {
+
+            const taskId =
+                Number(ctx.match[1])
+
+            await handleDoneByAction(
+                ctx,
+                taskId
+            )
         }
+    )
 
-        const page = 1
+    bot.action(
+        /delete_(.+)/,
+        async (ctx) => {
 
-        const filter = 'all'
+            const taskId =
+                Number(ctx.match[1])
 
-        const result = await taskService.getUserTasks(
-            user.id,
-            page,
-            filter
-        )
-
-        const {
-            tasks,
-            totalPages,
-            currentPage,
-        } = result
-
-        if (!tasks.length) {
-            return ctx.reply('You have no tasks')
+            await handleDeleteByAction(
+                ctx,
+                taskId
+            )
         }
+    )
 
-        const message = buildTasksMessage(
-            tasks,
-            currentPage,
-            totalPages,
-            filter
-        )
+    bot.action(
+        /edit_(.+)/,
+        async (ctx) => {
 
-        const keyboard = buildTasksKeyboard(
-            tasks,
-            currentPage,
-            totalPages,
-            filter
-        )
+            const taskId =
+                Number(ctx.match[1])
 
-        await ctx.reply(
-            message,
-            keyboard
-        )
-    })
-
-    bot.command('done', async (ctx) => {
-        const telegramId = ctx.from.id
-
-        const user = await userRepository.findByTelegramId(telegramId)
-
-        if (!user) {
-            return ctx.reply('User not found')
+            await handleEditByAction(
+                ctx,
+                taskId
+            )
         }
+    )
 
-        const taskId = ctx.message.text
-            .replace('/done', '')
-            .trim()
+    // Task settings
 
-        if (!taskId) {
-            return ctx.reply('Provide task id')
+    bot.action(
+        /^priority_(\d+)$/,
+        async (ctx) => {
+            const taskId = Number(ctx.match[1])
+
+            await handlePriorityByAction(
+                ctx,
+                taskId
+            )
         }
-
-        const task = await taskService.markTaskDone(
-            Number(taskId),
-            user.id
-        )
-
-        if (!task) {
-            return ctx.reply('Task not found')
-        }
-
-        await ctx.reply(`Task completed: ${task.title}`)
-    })
-
-    bot.command('delete', async (ctx) => {
-        const telegramId = ctx.from.id
-
-        const user = await userRepository.findByTelegramId(telegramId)
-
-        if (!user) {
-            return ctx.reply('User not found')
-        }
-
-        const taskId = ctx.message.text
-            .replace('/delete', '')
-            .trim()
-
-        if (!taskId) {
-            return ctx.reply('Provide task id')
-        }
-
-        const deletedTask = await taskService.deleteTask(
-            Number(taskId),
-            user.id
-        )
-
-        if (!deletedTask) {
-            return ctx.reply('Task not found')
-        }
-
-        await ctx.reply(
-            `Task deleted: ${deletedTask.title}`
-        )
-    })
-
-    bot.action(/done_(.+)/, async (ctx) => {
-        const taskId = Number(ctx.match[1])
-
-        const telegramId = ctx.from.id
-
-        const user = await userRepository.findByTelegramId(
-            telegramId
-        )
-
-        if (!user) {
-            return ctx.answerCbQuery('User not found')
-        }
-
-        const task = await taskService.markTaskDone(
-            taskId,
-            user.id
-        )
-
-        if (!task) {
-            return ctx.answerCbQuery('Task not found')
-        }
-
-        await ctx.answerCbQuery('Task completed')
-
-        await ctx.editMessageText(
-            `✅ ${task.title}`
-        )
-    })
-
-    bot.action(/delete_(.+)/, async (ctx) => {
-        const taskId = Number(ctx.match[1])
-
-        const telegramId = ctx.from.id
-
-        const user = await userRepository.findByTelegramId(
-            telegramId
-        )
-
-        if (!user) {
-            return ctx.answerCbQuery('User not found')
-        }
-
-        const deletedTask = await taskService.deleteTask(
-            taskId,
-            user.id
-        )
-
-        if (!deletedTask) {
-            return ctx.answerCbQuery('Task not found')
-        }
-
-        await ctx.answerCbQuery('Task deleted')
-
-        await ctx.deleteMessage()
-    })
-
-    bot.action(/edit_(.+)/, async (ctx) => {
-        const taskId = Number(ctx.match[1])
-
-        const telegramId = ctx.from.id
-
-        editSessions.set(
-            telegramId,
-            taskId
-        )
-
-        await ctx.answerCbQuery()
-
-        await ctx.reply(
-            'Send new task title'
-        )
-    })
-
-    bot.action(/^priority_(\d+)$/, async (ctx) => {
-        const taskId = Number(ctx.match[1])
-
-        await ctx.answerCbQuery()
-
-        await ctx.reply(
-            'Choose priority:',
-            Markup.inlineKeyboard([
-                [
-                    Markup.button.callback(
-                        '🔴 High',
-                        `set_priority_${taskId}_high`
-                    ),
-                ],
-                [
-                    Markup.button.callback(
-                        '🟡 Medium',
-                        `set_priority_${taskId}_medium`
-                    ),
-                ],
-                [
-                    Markup.button.callback(
-                        '🟢 Low',
-                        `set_priority_${taskId}_low`
-                    ),
-                ],
-            ])
-        )
-    })
+    )
 
     bot.action(
         /set_priority_(\d+)_(high|medium|low)/,
         async (ctx) => {
-            const telegramId = ctx.from.id
-
-            const user =
-                await userRepository.findByTelegramId(
-                    telegramId
-                )
-
-            if (!user) {
-                return ctx.answerCbQuery(
-                    'User not found'
-                )
-            }
 
             const taskId =
                 Number(ctx.match[1])
@@ -346,25 +100,10 @@ export function registerTaskModule(bot) {
             const priority =
                 ctx.match[2]
 
-            const updatedTask =
-                await taskService.updateTaskPriority(
-                    taskId,
-                    user.id,
-                    priority
-                )
-
-            if (!updatedTask) {
-                return ctx.answerCbQuery(
-                    'Task not found'
-                )
-            }
-
-            await ctx.answerCbQuery(
-                'Priority updated'
-            )
-
-            await ctx.reply(
-                `Priority changed to ${priority}`
+            await handleSetPriorityByAction(
+                ctx,
+                taskId,
+                priority
             )
         }
     )
@@ -376,48 +115,9 @@ export function registerTaskModule(bot) {
             const taskId =
                 Number(ctx.match[1])
 
-            await ctx.answerCbQuery()
-
-            await ctx.reply(
-                'Choose category:',
-                Markup.inlineKeyboard([
-                    [
-                        Markup.button.callback(
-                            '💼 Work',
-                            `set_category_${taskId}_work`
-                        ),
-                    ],
-                    [
-                        Markup.button.callback(
-                            '📚 Study',
-                            `set_category_${taskId}_study`
-                        ),
-                    ],
-                    [
-                        Markup.button.callback(
-                            '🏠 Home',
-                            `set_category_${taskId}_home`
-                        ),
-                    ],
-                    [
-                        Markup.button.callback(
-                            '💪 Health',
-                            `set_category_${taskId}_health`
-                        ),
-                    ],
-                    [
-                        Markup.button.callback(
-                            '🛒 Shopping',
-                            `set_category_${taskId}_shopping`
-                        ),
-                    ],
-                    [
-                        Markup.button.callback(
-                            '📌 Other',
-                            `set_category_${taskId}_other`
-                        ),
-                    ],
-                ])
+            await handleCategoryByAction(
+                ctx,
+                taskId
             )
         }
     )
@@ -426,224 +126,60 @@ export function registerTaskModule(bot) {
         /^set_category_(\d+)_(.+)$/,
         async (ctx) => {
 
-            const telegramId = ctx.from.id
-
-            const user =
-                await userRepository.findByTelegramId(
-                    telegramId
-                )
-
-            if (!user) {
-                return ctx.answerCbQuery(
-                    'User not found'
-                )
-            }
-
             const taskId =
                 Number(ctx.match[1])
 
             const category =
                 ctx.match[2]
 
-            const updatedTask =
-                await taskService.updateTaskCategory(
-                    taskId,
-                    user.id,
-                    category
-                )
-
-            if (!updatedTask) {
-                return ctx.answerCbQuery(
-                    'Task not found'
-                )
-            }
-
-            await ctx.answerCbQuery(
-                'Category updated'
-            )
-
-            await ctx.reply(
-                `Category changed to ${category}`
+            await handleSetCategoryByAction(
+                ctx,
+                taskId,
+                category
             )
         }
     )
 
-    bot.action(/tasks_page_(\d+)_(all|active|done)/, async (ctx) => {
-        const page = Number(ctx.match[1])
+    // Navigation
 
-        const filter = ctx.match[2]
+    bot.action(/tasks_page_(\d+)_(all|active|done)/,
+        async (ctx) => {
 
-        if (page < 1) {
-            return ctx.answerCbQuery('Invalid page')
-        }
+            const page = Number(ctx.match[1])
 
-        const telegramId = ctx.from.id
+            const filter = ctx.match[2]
 
-        const user = await userRepository.findByTelegramId(
-            telegramId
-        )
-
-        if (!user) {
-            return ctx.answerCbQuery('User not found')
-        }
-
-        const result =
-            await taskService.getUserTasks(
-                user.id,
+            await handlePagination(
+                ctx,
                 page,
                 filter
             )
-
-        const {
-            tasks,
-            totalPages,
-            currentPage,
-        } = result
-
-        if (!tasks.length) {
-            return ctx.answerCbQuery('No more tasks')
         }
+    )
 
-        const message =
-            buildTasksMessage(
-                tasks,
-                currentPage,
-                totalPages,
-                filter
-            )
+    bot.action(/filter_(all|active|done)/,
+        async (ctx) => {
 
-        const keyboard =
-            buildTasksKeyboard(
-                tasks,
-                currentPage,
-                totalPages,
-                filter
-            )
+            const page = 1
 
-        await ctx.editMessageText(
-            message,
-            keyboard
-        )
-    })
+            const filter = ctx.match[1]
 
-    bot.action(/filter_(all|active|done)/, async (ctx) => {
-        const filter = ctx.match[1]
-
-        const telegramId = ctx.from.id
-
-        const user =
-            await userRepository.findByTelegramId(
-                telegramId
-            )
-
-        if (!user) {
-            return ctx.answerCbQuery(
-                'User not found'
-            )
-        }
-
-        const page = 1
-
-        const result =
-            await taskService.getUserTasks(
-                user.id,
+            await handleFilter(
+                ctx,
                 page,
                 filter
             )
-
-        const {
-            tasks,
-            totalPages,
-            currentPage,
-        } = result
-
-        if (!tasks.length) {
-            return ctx.answerCbQuery(
-                'No tasks found'
-            )
         }
-
-        const message =
-            buildTasksMessage(
-                tasks,
-                currentPage,
-                totalPages,
-                filter
-            )
-
-        const keyboard =
-            buildTasksKeyboard(
-                tasks,
-                currentPage,
-                totalPages,
-                filter
-            )
-
-        await ctx.editMessageText(
-            message,
-            keyboard
-        )
-    })
-
-    bot.on('text', async (ctx) => {
-        const telegramId = ctx.from.id
-
-        if (
-            !editSessions.has(
-                telegramId
-            )
-        ) {
-            return
-        }
-
-        const taskId =
-            editSessions.get(
-                telegramId
-            )
-
-        const user =
-            await userRepository.findByTelegramId(
-                telegramId
-            )
-
-        if (!user) {
-            return ctx.reply(
-                'User not found'
-            )
-        }
-
-        const newTitle =
-            ctx.message.text.trim()
-
-        if (!newTitle) {
-            return ctx.reply(
-                'Task title cannot be empty'
-            )
-        }
-
-        const updatedTask =
-            await taskService.updateTaskTitle(
-                taskId,
-                user.id,
-                newTitle
-            )
-
-        editSessions.delete(
-            telegramId
-        )
-
-        if (!updatedTask) {
-            return ctx.reply(
-                'Task not found'
-            )
-        }
-
-        await ctx.reply(
-            `Task updated: ${updatedTask.title}`
-        )
-    })
+    )
 
     bot.action('current_page', async (ctx) => {
         await ctx.answerCbQuery()
     })
+
+    // Text
+
+    bot.on(
+        'text',
+        handleEditByText
+    )
 }
