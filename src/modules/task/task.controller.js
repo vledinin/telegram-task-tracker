@@ -7,6 +7,9 @@ import {handleEditByAction, handleEditByText} from "./handlers/edit.handler.js";
 import {handlePriorityByAction, handleSetPriorityByAction} from "./handlers/priority.handler.js";
 import {handleCategoryByAction, handleSetCategoryByAction} from "./handlers/category.handler.js";
 import {handleAddTask} from "./handlers/addTask.handler.js";
+import {handleCreatePriority} from "./handlers/createPriority.handler.js";
+import {handleCreateTaskText} from "./handlers/createTaskText.handler.js";
+import {handleCreateCategory} from "./handlers/createCategory.handler.js";
 
 export function registerTaskModule(bot) {
 
@@ -30,6 +33,18 @@ export function registerTaskModule(bot) {
     bot.command(
         'delete',
         handleDeleteByCommand
+    )
+
+    // Create Task
+
+    bot.action(
+        /create_priority_(high|medium|low)/,
+        handleCreatePriority
+    )
+
+    bot.action(
+        /create_category_(.+)/,
+        handleCreateCategory
     )
 
     // Task actions
@@ -177,6 +192,20 @@ export function registerTaskModule(bot) {
     })
 
     // Text
+
+    bot.on(
+        'text',
+        async (ctx) => {
+
+            const handled =
+                await handleCreateTaskText(ctx)
+
+            if (handled) {
+                return
+            }
+
+        }
+    )
 
     bot.on(
         'text',
