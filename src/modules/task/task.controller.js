@@ -10,6 +10,7 @@ import {handleAddTask} from "./handlers/addTask.handler.js";
 import {handleCreatePriority} from "./handlers/createPriority.handler.js";
 import {handleCreateTaskText} from "./handlers/createTaskText.handler.js";
 import {handleCreateCategory} from "./handlers/createCategory.handler.js";
+import {handleCancelCreateTask} from "./handlers/cancelCreateTask.handler.js";
 
 export function registerTaskModule(bot) {
 
@@ -45,6 +46,18 @@ export function registerTaskModule(bot) {
     bot.action(
         /create_category_(.+)/,
         handleCreateCategory
+    )
+
+    // Cancel Create Task
+
+    bot.hears(
+        '❌ Cancel',
+        handleCancelCreateTask
+    )
+
+    bot.action(
+        'create_cancel',
+        handleCancelCreateTask
     )
 
     // Task actions

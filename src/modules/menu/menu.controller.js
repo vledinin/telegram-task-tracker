@@ -3,6 +3,7 @@ import { mainKeyboard } from '../../keyboards/main.keyboard.js'
 import { showTasks } from '../task/handlers/showTasks.handler.js'
 import { showHelp } from './handlers/help.handler.js'
 import { createTaskSessions } from '../../state/create-task.session.js'
+import {Markup} from "telegraf";
 
 export function registerMenuModule(bot) {
     console.log('Menu module loaded')
@@ -46,7 +47,11 @@ export function registerMenuModule(bot) {
             )
 
             await ctx.reply(
-                'Enter task title:'
+                'Enter task title:',
+
+                Markup.keyboard([
+                    ['❌ Cancel']
+                ]).resize()
             )
         }
     )

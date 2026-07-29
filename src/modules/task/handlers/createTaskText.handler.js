@@ -22,7 +22,11 @@ export async function handleCreateTaskText(ctx) {
         session.step = 'date'
 
         await ctx.reply(
-            'Enter due date (YYYY-MM-DD) or type "-" to skip:'
+            'Enter due date (YYYY-MM-DD) or type "-" to skip:',
+
+            Markup.keyboard([
+                ['❌ Cancel']
+            ]).resize()
         )
 
         return true
@@ -60,17 +64,19 @@ export async function handleCreateTaskText(ctx) {
                         '🔴 High',
                         'create_priority_high'
                     ),
-                ],
-                [
                     Markup.button.callback(
                         '🟡 Medium',
                         'create_priority_medium'
                     ),
-                ],
-                [
                     Markup.button.callback(
                         '🟢 Low',
                         'create_priority_low'
+                    ),
+                ],
+                [
+                    Markup.button.callback(
+                        '❌ Cancel',
+                        'create_cancel'
                     ),
                 ],
             ])

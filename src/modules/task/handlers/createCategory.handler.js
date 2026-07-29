@@ -6,6 +6,7 @@ import { userRepository }
 
 import { taskService }
     from '../task.service.js'
+import {mainKeyboard} from "../../../keyboards/main.keyboard.js";
 
 export async function handleCreateCategory(ctx) {
 
@@ -55,6 +56,7 @@ export async function handleCreateCategory(ctx) {
     await ctx.answerCbQuery()
 
     await ctx.reply(
-        `Task created: ${task.title}`
+        `✅ Task "${task.title}" created successfully!`,
+        mainKeyboard
     )
 }
