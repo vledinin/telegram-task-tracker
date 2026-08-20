@@ -1,5 +1,9 @@
 import { createTaskSessions } from '../../../state/create-task.session.js'
 import {Markup} from "telegraf";
+import {
+    TASK_TITLE_MIN_LENGTH,
+    TASK_TITLE_MAX_LENGTH,
+} from '../../../constants/validation.constants.js'
 
 export async function handleCreateTaskText(ctx) {
 
@@ -16,8 +20,42 @@ export async function handleCreateTaskText(ctx) {
 
     if (session.step === 'title') {
 
-        session.title =
+        const title =
             ctx.message.text.trim()
+
+        if (!title) {
+            await ctx.reply(
+                'Task title cannot be empty.'
+            )
+
+            return true
+        }
+
+        if (title.length < TASK_TITLE_MIN_LENGTH) {
+            await ctx.reply(
+                'Task title must contain at least 3 characters.'
+            )
+
+            return true
+        }
+
+        if (title.length > TASK_TITLE_MAX_LENGTH) {
+            await ctx.reply(
+                'Task title cannot exceed 100 characters.'
+            )
+
+            return true
+        }
+
+        if (!/[a-zA-Zа-яА-ЯёЁ0-9]/.test(title)) {
+            await ctx.reply(
+                'Task title must contain at least one letter or number.'
+            )
+
+            return true
+        }
+
+        session.title = title
 
         session.step = 'date'
 
@@ -37,20 +75,40 @@ export async function handleCreateTaskText(ctx) {
         const dueDate =
             ctx.message.text.trim()
 
-        if (
-            dueDate !== '-' &&
-            Number.isNaN(Date.parse(dueDate))
-        ) {
-            await ctx.reply(
-                'Invalid date format.\nUse YYYY-MM-DD or "-"'
-            )
-
-            return true
-        }
-
         if (dueDate === '-') {
+
             session.dueDate = null
+
         } else {
+
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(dueDate)) {
+                await ctx.reply(
+                    'Invalid date format.\n' +
+                    'Use YYYY-MM-DD or "-" to skip.'
+                )
+
+                return true
+            }
+
+            const date =
+                new Date(dueDate)
+
+            const [year, month, day] =
+                dueDate.split('-').map(Number)
+
+            if (
+                date.getFullYear() !== year ||
+                date.getMonth() + 1 !== month ||
+                date.getDate() !== day
+            ) {
+                await ctx.reply(
+                    'The specified date does not exist.\n' +
+                    'Please enter a valid calendar date.'
+                )
+
+                return true
+            }
+
             session.dueDate = dueDate
         }
 

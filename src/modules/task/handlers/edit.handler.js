@@ -21,7 +21,8 @@ export async function handleEditByAction(
 }
 
 export async function handleEditByText(
-    ctx
+    ctx,
+    next
 ) {
     const telegramId = ctx.from.id
 
@@ -30,7 +31,7 @@ export async function handleEditByText(
             telegramId
         )
     ) {
-        return
+        return next()
     }
 
     const taskId =

@@ -11,6 +11,12 @@ export async function handleCancelCreateTask(ctx) {
         )
 
     if (!session) {
+        if (ctx.callbackQuery) {
+            return ctx.answerCbQuery(
+                'Session expired'
+            )
+        }
+
         return false
     }
 

@@ -208,7 +208,7 @@ export function registerTaskModule(bot) {
 
     bot.on(
         'text',
-        async (ctx) => {
+        async (ctx, next) => {
 
             const handled =
                 await handleCreateTaskText(ctx)
@@ -217,6 +217,7 @@ export function registerTaskModule(bot) {
                 return
             }
 
+            return next()
         }
     )
 
