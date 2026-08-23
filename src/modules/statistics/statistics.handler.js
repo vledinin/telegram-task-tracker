@@ -1,14 +1,13 @@
 import { userRepository }
     from '../user/user.repository.js'
-
 import { statisticsService }
     from './statistics.service.js'
-import {
-    buildStatisticsMessage,
-    buildStatisticsKeyboard,
-} from './statistics.utils.js'
+import { buildStatisticsMessage, buildStatisticsKeyboard }
+    from './statistics.utils.js'
 
-export async function showStatistics(ctx) {
+export async function showStatistics(
+    ctx
+) {
 
     const telegramId =
         ctx.from.id

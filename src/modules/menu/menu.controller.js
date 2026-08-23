@@ -1,22 +1,23 @@
-import { userService } from '../user/user.service.js'
-import { mainKeyboard } from '../../keyboards/main.keyboard.js'
-import { showHelp } from './handlers/help.handler.js'
-import {startCreateTask} from "./handlers/startCreateTask.handler.js";
-import {handleShowTasks} from "./handlers/showTasksMenu.handler.js";
+import { handleStart }
+    from './handlers/start.handler.js'
+import { handleShowHelp }
+    from './handlers/help.handler.js'
+import { handleStartCreateTask }
+    from './handlers/startCreateTask.handler.js'
+import { handleShowTasks }
+    from './handlers/showTasksMenu.handler.js'
 
-export function registerMenuModule(bot) {
-    console.log('Menu module loaded')
+export function registerMenuModule(
+    bot
+) {
 
-    bot.start(async (ctx) => {
-        console.log('/start handler')
+    console.log(
+        'Menu module loaded'
+    )
 
-        await userService.ensureUserExists(ctx)
-
-        await ctx.reply(
-            'Welcome to Task Tracker!',
-            mainKeyboard
-        )
-    })
+    bot.start(
+        handleStart
+    )
 
     bot.hears(
         '📋 My Tasks',
@@ -25,11 +26,11 @@ export function registerMenuModule(bot) {
 
     bot.hears(
         '❓ Help',
-        showHelp
+        handleShowHelp
     )
 
     bot.hears(
         '➕ Add Task',
-        startCreateTask
+        handleStartCreateTask
     )
 }

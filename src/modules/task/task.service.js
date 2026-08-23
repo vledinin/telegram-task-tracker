@@ -1,6 +1,8 @@
-import { taskRepository } from './task.repository.js'
+import { taskRepository }
+    from './task.repository.js'
 
 export const taskService = {
+
     async createTask(
         userId,
         title,
@@ -8,7 +10,8 @@ export const taskService = {
         priority = 'medium',
         category = 'other'
     ) {
-        return await taskRepository.createTask({
+
+        return taskRepository.createTask({
             userId,
             title,
             dueDate,
@@ -22,6 +25,7 @@ export const taskService = {
         page = 1,
         filter = 'all'
     ) {
+
         const limit = 5
 
         const offset =
@@ -54,15 +58,23 @@ export const taskService = {
         }
     },
 
-    async markTaskDone(taskId, userId) {
-        return await taskRepository.markTaskDone(
+    async markTaskDone(
+        taskId,
+        userId
+    ) {
+
+        return taskRepository.markTaskDone(
             taskId,
             userId
         )
     },
 
-    async deleteTask(taskId, userId) {
-        return await taskRepository.deleteTask(
+    async deleteTask(
+        taskId,
+        userId
+    ) {
+
+        return taskRepository.deleteTask(
             taskId,
             userId
         )
@@ -73,7 +85,8 @@ export const taskService = {
         userId,
         title
     ) {
-        return await taskRepository.updateTaskTitle(
+
+        return taskRepository.updateTaskTitle(
             taskId,
             userId,
             title
@@ -85,7 +98,8 @@ export const taskService = {
         userId,
         priority
     ) {
-        return await taskRepository.updateTaskPriority(
+
+        return taskRepository.updateTaskPriority(
             taskId,
             userId,
             priority
@@ -97,7 +111,8 @@ export const taskService = {
         userId,
         category
     ) {
-        return await taskRepository.updateTaskCategory(
+
+        return taskRepository.updateTaskCategory(
             taskId,
             userId,
             category

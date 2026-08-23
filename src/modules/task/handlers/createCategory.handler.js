@@ -1,16 +1,18 @@
 import { createTaskSessions }
     from '../../../state/create-task.session.js'
-
 import { userRepository }
     from '../../user/user.repository.js'
-
 import { taskService }
     from '../task.service.js'
-import {mainKeyboard} from "../../../keyboards/main.keyboard.js";
+import {mainKeyboard}
+    from "../../../keyboards/main.keyboard.js"
 
-export async function handleCreateCategory(ctx) {
+export async function handleCreateCategory(
+    ctx
+) {
 
-    const telegramId = ctx.from.id
+    const telegramId =
+        ctx.from.id
 
     const session =
         createTaskSessions.get(

@@ -1,18 +1,33 @@
-import {showTasks} from './handlers/showTasks.handler.js'
-import {handlePagination} from "./handlers/pagination.handler.js";
-import {handleFilter} from "./handlers/filter.handler.js";
-import {handleDoneByAction, handleDoneByCommand} from "./handlers/done.handler.js";
-import {handleDeleteByAction, handleDeleteByCommand} from "./handlers/delete.handler.js";
-import {handleEditByAction, handleEditByText} from "./handlers/edit.handler.js";
-import {handlePriorityByAction, handleSetPriorityByAction} from "./handlers/priority.handler.js";
-import {handleCategoryByAction, handleSetCategoryByAction} from "./handlers/category.handler.js";
-import {handleAddTask} from "./handlers/addTask.handler.js";
-import {handleCreatePriority} from "./handlers/createPriority.handler.js";
-import {handleCreateTaskText} from "./handlers/createTaskText.handler.js";
-import {handleCreateCategory} from "./handlers/createCategory.handler.js";
-import {handleCancelCreateTask} from "./handlers/cancelCreateTask.handler.js";
+import {showTasks}
+    from './handlers/showTasks.handler.js'
+import {handlePagination}
+    from "./handlers/pagination.handler.js"
+import {handleFilter}
+    from "./handlers/filter.handler.js"
+import {handleDoneByAction, handleDoneByCommand}
+    from "./handlers/done.handler.js"
+import {handleDeleteByAction, handleDeleteByCommand}
+    from "./handlers/delete.handler.js"
+import {handleEditByAction, handleEditByText}
+    from "./handlers/edit.handler.js"
+import {handlePriorityByAction, handleSetPriorityByAction}
+    from "./handlers/priority.handler.js"
+import {handleCategoryByAction, handleSetCategoryByAction}
+    from "./handlers/category.handler.js"
+import {handleAddTask}
+    from "./handlers/addTask.handler.js"
+import {handleCreatePriority}
+    from "./handlers/createPriority.handler.js"
+import {handleCreateTaskText}
+    from "./handlers/createTaskText.handler.js"
+import {handleCreateCategory}
+    from "./handlers/createCategory.handler.js"
+import {handleCancelCreateTask}
+    from "./handlers/cancelCreateTask.handler.js"
 
-export function registerTaskModule(bot) {
+export function registerTaskModule(
+    bot
+) {
 
     // Commands
 
@@ -21,10 +36,10 @@ export function registerTaskModule(bot) {
         handleAddTask
     )
 
-    bot.command('tasks',
-        async (ctx) => {
-        await showTasks(ctx)
-    })
+    bot.command(
+        'tasks',
+        showTasks
+    )
 
     bot.command(
         'done',
@@ -63,155 +78,72 @@ export function registerTaskModule(bot) {
     // Task actions
 
     bot.action(
-        /done_(.+)/,
-        async (ctx) => {
-
-            const taskId =
-                Number(ctx.match[1])
-
-            await handleDoneByAction(
-                ctx,
-                taskId
-            )
-        }
+        /^done_(\d+)$/,
+        handleDoneByAction
     )
 
     bot.action(
-        /delete_(.+)/,
-        async (ctx) => {
-
-            const taskId =
-                Number(ctx.match[1])
-
-            await handleDeleteByAction(
-                ctx,
-                taskId
-            )
-        }
+        /^delete_(\d+)$/,
+        handleDeleteByAction
     )
 
     bot.action(
-        /edit_(.+)/,
-        async (ctx) => {
-
-            const taskId =
-                Number(ctx.match[1])
-
-            await handleEditByAction(
-                ctx,
-                taskId
-            )
-        }
+        /^edit_(\d+)$/,
+        handleEditByAction
     )
 
     // Task settings
 
     bot.action(
         /^priority_(\d+)$/,
-        async (ctx) => {
-            const taskId = Number(ctx.match[1])
-
-            await handlePriorityByAction(
-                ctx,
-                taskId
-            )
-        }
+        handlePriorityByAction
     )
 
     bot.action(
-        /set_priority_(\d+)_(high|medium|low)/,
-        async (ctx) => {
-
-            const taskId =
-                Number(ctx.match[1])
-
-            const priority =
-                ctx.match[2]
-
-            await handleSetPriorityByAction(
-                ctx,
-                taskId,
-                priority
-            )
-        }
+        /^set_priority_(\d+)_(high|medium|low)$/,
+        handleSetPriorityByAction
     )
 
     bot.action(
         /^category_(\d+)$/,
-        async (ctx) => {
-
-            const taskId =
-                Number(ctx.match[1])
-
-            await handleCategoryByAction(
-                ctx,
-                taskId
-            )
-        }
+        handleCategoryByAction
     )
 
     bot.action(
         /^set_category_(\d+)_(.+)$/,
-        async (ctx) => {
-
-            const taskId =
-                Number(ctx.match[1])
-
-            const category =
-                ctx.match[2]
-
-            await handleSetCategoryByAction(
-                ctx,
-                taskId,
-                category
-            )
-        }
+        handleSetCategoryByAction
     )
 
     // Navigation
 
-    bot.action(/tasks_page_(\d+)_(all|active|done)/,
-        async (ctx) => {
-
-            const page = Number(ctx.match[1])
-
-            const filter = ctx.match[2]
-
-            await handlePagination(
-                ctx,
-                page,
-                filter
-            )
-        }
+    bot.action(
+        /^tasks_page_(\d+)_(all|active|done)$/,
+        handlePagination
     )
 
-    bot.action(/filter_(all|active|done)/,
-        async (ctx) => {
-
-            const page = 1
-
-            const filter = ctx.match[1]
-
-            await handleFilter(
-                ctx,
-                page,
-                filter
-            )
-        }
+    bot.action(
+        /^filter_(all|active|done)$/,
+        handleFilter
     )
 
-    bot.action('current_page', async (ctx) => {
-        await ctx.answerCbQuery()
-    })
+    bot.action(
+        'current_page',
+        (ctx) => ctx.answerCbQuery()
+    )
 
     // Text
 
     bot.on(
         'text',
-        async (ctx, next) => {
+        async (
+            ctx,
+            next
+        ) => {
 
             const handled =
-                await handleCreateTaskText(ctx)
+                await handleCreateTaskText(
+                    ctx
+                )
 
             if (handled) {
                 return

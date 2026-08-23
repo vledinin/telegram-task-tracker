@@ -1,4 +1,7 @@
-export async function showHelp(ctx) {
+export async function handleShowHelp(
+    ctx
+) {
+
     const message = `
 🤖 Task Tracker Bot
 
@@ -22,5 +25,7 @@ Show this help message.
 /delete
 `
 
-    await ctx.reply(message)
+    await ctx.reply(
+        message
+    )
 }

@@ -1,8 +1,17 @@
-import { pool } from '../../config/db.js'
+import { pool }
+    from '../../config/db.js'
 
 export const userRepository = {
-    async createUser(userData) {
-        const { telegramId, username, firstName } = userData
+
+    async createUser(
+        userData
+    ) {
+
+        const {
+            telegramId,
+            username,
+            firstName
+        } = userData
 
         const query = `
             INSERT INTO users (
@@ -21,19 +30,30 @@ export const userRepository = {
             firstName,
         ]
 
-        const result = await pool.query(query, values)
+        const result =
+            await pool.query(
+                query,
+                values
+            )
 
         return result.rows[0]
     },
 
-    async findByTelegramId(telegramId) {
+    async findByTelegramId(
+        telegramId
+    ) {
+
         const query = `
         SELECT *
         FROM users
         WHERE telegram_id = $1
     `
 
-        const result = await pool.query(query, [telegramId])
+        const result =
+            await pool.query(
+                query,
+                [telegramId]
+            )
 
         return result.rows[0]
     }

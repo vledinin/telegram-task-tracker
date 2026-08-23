@@ -1,4 +1,7 @@
-import { Markup } from 'telegraf'
+import { Markup }
+    from 'telegraf'
+import { priorityNames, categoryNames }
+    from "../../constants/statistics.constants.js"
 
 export function buildStatisticsMessage(
     statistics
@@ -31,12 +34,6 @@ export function buildStatisticsMessage(
     )
 }
 
-const priorityNames = {
-    high: '🔴 High',
-    medium: '🟡 Medium',
-    low: '🟢 Low',
-}
-
 export function buildPriorityStatistics(
     priorities
 ) {
@@ -48,15 +45,6 @@ export function buildPriorityStatistics(
         .join('\n')
 }
 
-const categoryNames = {
-    work: '💼 Work',
-    study: '📚 Study',
-    home: '🏠 Home',
-    health: '💪 Health',
-    shopping: '🛒 Shopping',
-    other: '📌 Other',
-}
-
 export function buildCategoryStatistics(
     categories
 ) {
@@ -66,15 +54,6 @@ export function buildCategoryStatistics(
                 `${categoryNames[category]}: ${count}`
         )
         .join('\n')
-}
-
-export function buildOverviewStatisticsMessage(
-    statistics
-) {
-
-    return buildStatisticsMessage(
-        statistics
-    )
 }
 
 export function buildPriorityStatisticsMessage(
@@ -108,6 +87,7 @@ export function buildCategoryStatisticsMessage(
 }
 
 export function buildStatisticsKeyboard() {
+
     return Markup.inlineKeyboard([
         [
             Markup.button.callback(

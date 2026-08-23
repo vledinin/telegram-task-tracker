@@ -1,4 +1,5 @@
-import { Markup } from 'telegraf'
+import { Markup }
+    from 'telegraf'
 
 export const mainKeyboard =
     Markup.keyboard([

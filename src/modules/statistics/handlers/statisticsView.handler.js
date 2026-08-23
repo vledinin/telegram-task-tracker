@@ -1,14 +1,12 @@
 import { userRepository }
     from '../../user/user.repository.js'
-
 import { statisticsService }
     from '../statistics.service.js'
-
 import {
-    buildOverviewStatisticsMessage,
     buildPriorityStatisticsMessage,
     buildCategoryStatisticsMessage,
     buildStatisticsKeyboard,
+    buildStatisticsMessage
 }
     from '../statistics.utils.js'
 
@@ -41,10 +39,9 @@ export async function handleStatisticsView(
     if (view === 'overview') {
 
         message =
-            buildOverviewStatisticsMessage(
+            buildStatisticsMessage(
                 statistics
             )
-
     }
 
     if (view === 'priority') {
@@ -53,7 +50,6 @@ export async function handleStatisticsView(
             buildPriorityStatisticsMessage(
                 statistics
             )
-
     }
 
     if (view === 'category') {

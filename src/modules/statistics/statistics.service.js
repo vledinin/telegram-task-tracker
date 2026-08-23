@@ -3,7 +3,9 @@ import { statisticsRepository }
 
 export const statisticsService = {
 
-    async getUserStatistics(userId) {
+    async getUserStatistics(
+        userId
+    ) {
 
         const statistics =
             await statisticsRepository.getUserStatistics(
@@ -22,16 +24,16 @@ export const statisticsService = {
 
         return {
             totalTasks:
-                Number(statistics.total_tasks),
+            statistics.totalTasks,
 
             completedTasks:
-                Number(statistics.completed_tasks),
+            statistics.completedTasks,
 
             activeTasks:
-                Number(statistics.active_tasks),
+            statistics.activeTasks,
 
             overdueTasks:
-                Number(statistics.overdue_tasks),
+            statistics.overdueTasks,
 
             categories,
 

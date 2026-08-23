@@ -1,4 +1,7 @@
-import { Markup } from 'telegraf'
+import { Markup }
+    from 'telegraf'
+import { categoryIcons, priorityIcons }
+    from '../../constants/task.constants.js'
 
 export function buildTasksMessage(
     tasks,
@@ -6,32 +9,15 @@ export function buildTasksMessage(
     totalPages,
     filter
 ) {
+
     let message =
         `📄 Tasks — Page ${currentPage}/${totalPages}\n` +
         `Filter: ${filter}\n\n`
 
     for (const task of tasks) {
-        let categoryIcon = '📌'
 
-        if (task.category === 'work') {
-            categoryIcon = '💼'
-        }
-
-        if (task.category === 'study') {
-            categoryIcon = '📚'
-        }
-
-        if (task.category === 'home') {
-            categoryIcon = '🏠'
-        }
-
-        if (task.category === 'health') {
-            categoryIcon = '💪'
-        }
-
-        if (task.category === 'shopping') {
-            categoryIcon = '🛒'
-        }
+        const categoryIcon =
+            categoryIcons[task.category] ?? '📌'
 
         const status =
             task.is_done ? '✅' : '❌'
@@ -41,15 +27,8 @@ export function buildTasksMessage(
             task.due_date &&
             new Date(task.due_date) < new Date()
 
-        let priorityIcon = '🟡'
-
-        if (task.priority === 'high') {
-            priorityIcon = '🔴'
-        }
-
-        if (task.priority === 'low') {
-            priorityIcon = '🟢'
-        }
+        const priorityIcon =
+            priorityIcons[task.priority] ?? '🟡'
 
         message +=
             `${categoryIcon} ${priorityIcon} ${status} ${task.id}. ${task.title}\n`
@@ -80,6 +59,7 @@ export function buildTasksKeyboard(
     totalPages,
     filter = 'all'
 ) {
+
     const keyboard = []
 
     keyboard.push([
@@ -163,7 +143,11 @@ export function buildTasksKeyboard(
         )
     }
 
-    keyboard.push(paginationRow)
+    keyboard.push(
+        paginationRow
+    )
 
-    return Markup.inlineKeyboard(keyboard)
+    return Markup.inlineKeyboard(
+        keyboard
+    )
 }

@@ -1,11 +1,17 @@
-import {userRepository} from "../../user/user.repository.js";
-import {taskService} from "../task.service.js";
-import {Markup} from "telegraf";
+import {userRepository}
+    from "../../user/user.repository.js"
+import {taskService}
+    from "../task.service.js"
+import {Markup}
+    from "telegraf"
 
 export async function handleCategoryByAction(
-    ctx,
-    taskId
+    ctx
 ) {
+
+    const taskId =
+        Number(ctx.match[1])
+
     await ctx.answerCbQuery()
 
     await ctx.reply(
@@ -52,11 +58,17 @@ export async function handleCategoryByAction(
 }
 
 export async function handleSetCategoryByAction(
-    ctx,
-    taskId,
-    category
+    ctx
 ) {
-    const telegramId = ctx.from.id
+
+    const taskId =
+        Number(ctx.match[1])
+
+    const category =
+        ctx.match[2]
+
+    const telegramId =
+        ctx.from.id
 
     const user =
         await userRepository.findByTelegramId(

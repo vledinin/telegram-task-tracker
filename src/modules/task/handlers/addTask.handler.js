@@ -1,14 +1,24 @@
-import {userRepository} from "../../user/user.repository.js";
-import {taskService} from "../task.service.js";
+import {userRepository}
+    from "../../user/user.repository.js"
+import {taskService}
+    from "../task.service.js"
 
-export async function handleAddTask(ctx) {
+export async function handleAddTask(
+    ctx
+) {
 
-    const telegramId = ctx.from.id
+    const telegramId =
+        ctx.from.id
 
-    const user = await userRepository.findByTelegramId(telegramId)
+    const user =
+        await userRepository.findByTelegramId(
+            telegramId
+        )
 
     if (!user) {
-        return ctx.reply('User not found')
+        return ctx.reply(
+            'User not found'
+        )
     }
 
     const taskText = ctx.message.text
@@ -99,5 +109,7 @@ export async function handleAddTask(ctx) {
             category
         )
 
-    await ctx.reply(`Task created: ${task.title}`)
+    await ctx.reply(
+        `Task created: ${task.title}`
+    )
 }

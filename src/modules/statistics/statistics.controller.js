@@ -1,12 +1,15 @@
 import { showStatistics }
     from './statistics.handler.js'
-
 import { handleStatisticsView }
     from './handlers/statisticsView.handler.js'
 
-export function registerStatisticsModule(bot) {
+export function registerStatisticsModule(
+    bot
+) {
 
-    console.log('Statistics module loaded')
+    console.log(
+        'Statistics module loaded'
+    )
 
     bot.hears(
         '📊 Statistics',

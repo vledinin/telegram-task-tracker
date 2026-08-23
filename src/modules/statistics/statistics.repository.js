@@ -1,4 +1,5 @@
-import { pool } from '../../config/db.js'
+import { pool }
+    from '../../config/db.js'
 
 export const statisticsRepository = {
 
@@ -29,10 +30,24 @@ export const statisticsRepository = {
                 [userId]
             )
 
-        return result.rows[0]
+        return {
+            totalTasks:
+                Number(result.rows[0].total_tasks),
+
+            completedTasks:
+                Number(result.rows[0].completed_tasks),
+
+            activeTasks:
+                Number(result.rows[0].active_tasks),
+
+            overdueTasks:
+                Number(result.rows[0].overdue_tasks),
+        }
     },
 
-    async getTasksByCategory(userId) {
+    async getTasksByCategory(
+        userId
+    ) {
 
         const query = `
         SELECT
@@ -50,10 +65,17 @@ export const statisticsRepository = {
                 [userId]
             )
 
-        return result.rows
+        return result.rows.map(
+            ({ category, count }) => ({
+                category,
+                count: Number(count),
+            })
+        )
     },
 
-    async getTasksByPriority(userId) {
+    async getTasksByPriority(
+        userId
+    ) {
 
         const query = `
         SELECT
@@ -71,6 +93,11 @@ export const statisticsRepository = {
                 [userId]
             )
 
-        return result.rows
+        return result.rows.map(
+            ({ priority, count }) => ({
+                priority,
+                count: Number(count),
+            })
+        )
     }
 }

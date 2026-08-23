@@ -1,14 +1,21 @@
-import {userRepository} from "../../user/user.repository.js";
-import {taskService} from "../task.service.js";
-import {buildTasksKeyboard, buildTasksMessage} from "../../../utils/task.utils.js";
+import {userRepository}
+    from "../../user/user.repository.js"
+import {taskService}
+    from "../task.service.js"
+import {buildTasksKeyboard, buildTasksMessage}
+    from "../task.utils.js"
 
 export async function handleFilter(
-    ctx,
-    page,
-    filter
+    ctx
 ) {
 
-    const telegramId = ctx.from.id
+    const page = 1
+
+    const filter =
+        ctx.match[1]
+
+    const telegramId =
+        ctx.from.id
 
     const user =
         await userRepository.findByTelegramId(

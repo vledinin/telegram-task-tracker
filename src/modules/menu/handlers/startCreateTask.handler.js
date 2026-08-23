@@ -1,11 +1,13 @@
 import { createTaskSessions }
     from '../../../state/create-task.session.js'
-
 import { Markup } from 'telegraf'
 
-export async function startCreateTask(ctx) {
+export async function handleStartCreateTask(
+    ctx
+) {
 
-    const telegramId = ctx.from.id
+    const telegramId =
+        ctx.from.id
 
     createTaskSessions.set(
         telegramId,

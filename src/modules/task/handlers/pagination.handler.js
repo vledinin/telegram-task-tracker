@@ -1,24 +1,38 @@
-import {userRepository} from "../../user/user.repository.js";
-import {taskService} from "../task.service.js";
-import {buildTasksKeyboard, buildTasksMessage} from "../../../utils/task.utils.js";
+import {userRepository}
+    from "../../user/user.repository.js"
+import {taskService}
+    from "../task.service.js"
+import {buildTasksKeyboard, buildTasksMessage}
+    from "../task.utils.js"
 
 export async function handlePagination(
-    ctx,
-    page,
-    filter
+    ctx
 ) {
+
+    const page =
+        Number(ctx.match[1])
+
+    const filter =
+        ctx.match[2]
+
     if (page < 1) {
-        return ctx.answerCbQuery('Invalid page')
+        return ctx.answerCbQuery(
+            'Invalid page'
+        )
     }
 
-    const telegramId = ctx.from.id
+    const telegramId =
+        ctx.from.id
 
-    const user = await userRepository.findByTelegramId(
-        telegramId
-    )
+    const user =
+        await userRepository.findByTelegramId(
+            telegramId
+        )
 
     if (!user) {
-        return ctx.answerCbQuery('User not found')
+        return ctx.answerCbQuery(
+            'User not found'
+        )
     }
 
     const result =
@@ -35,7 +49,9 @@ export async function handlePagination(
     } = result
 
     if (!tasks.length) {
-        return ctx.answerCbQuery('No more tasks')
+        return ctx.answerCbQuery(
+            'No more tasks'
+        )
     }
 
     const message =

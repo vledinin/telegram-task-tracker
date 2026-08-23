@@ -1,12 +1,21 @@
-import {editSessions} from "../../../state/edit.session.js";
-import {userRepository} from "../../user/user.repository.js";
-import {taskService} from "../task.service.js";
+import {editSessions}
+    from "../../../state/edit.session.js"
+import {userRepository}
+    from "../../user/user.repository.js"
+import {taskService}
+    from "../task.service.js"
+import {mainKeyboard}
+    from "../../../keyboards/main.keyboard.js"
 
 export async function handleEditByAction(
-    ctx,
-    taskId
+    ctx
 ) {
-    const telegramId = ctx.from.id
+
+    const taskId =
+        Number(ctx.match[1])
+
+    const telegramId =
+        ctx.from.id
 
     editSessions.set(
         telegramId,
@@ -24,7 +33,9 @@ export async function handleEditByText(
     ctx,
     next
 ) {
-    const telegramId = ctx.from.id
+
+    const telegramId =
+        ctx.from.id
 
     if (
         !editSessions.has(
@@ -77,6 +88,7 @@ export async function handleEditByText(
     }
 
     await ctx.reply(
-        `Task updated: ${updatedTask.title}`
+        `Task updated: ${updatedTask.title}`,
+        mainKeyboard
     )
 }

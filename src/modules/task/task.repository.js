@@ -1,7 +1,12 @@
-import { pool } from '../../config/db.js'
+import { pool }
+    from '../../config/db.js'
 
 export const taskRepository = {
-    async createTask(taskData) {
+
+    async createTask(
+        taskData
+    ) {
+
         const {
             userId,
             title,
@@ -30,7 +35,11 @@ export const taskRepository = {
             category,
         ]
 
-        const result = await pool.query(query, values)
+        const result =
+            await pool.query(
+                query,
+                values
+            )
 
         return result.rows[0]
     },
@@ -41,6 +50,7 @@ export const taskRepository = {
         offset,
         filter = 'all'
     ) {
+
         let query = `
             SELECT *
             FROM tasks
@@ -65,9 +75,17 @@ export const taskRepository = {
             OFFSET $3
         `
 
-        const values = [userId, limit, offset]
+        const values = [
+            userId,
+            limit,
+            offset
+        ]
 
-        const result = await pool.query(query, values)
+        const result =
+            await pool.query(
+                query,
+                values
+            )
 
         return result.rows
     },
@@ -76,6 +94,7 @@ export const taskRepository = {
         userId,
         filter = 'all'
     ) {
+
         let query = `
         SELECT COUNT(*)
         FROM tasks
@@ -90,17 +109,22 @@ export const taskRepository = {
             query += ' AND is_done = true'
         }
 
-        const result = await pool.query(
-            query,
-            [userId]
-        )
+        const result =
+            await pool.query(
+                query,
+                [userId]
+            )
 
         return Number(
             result.rows[0].count
         )
     },
 
-    async markTaskDone(taskId, userId) {
+    async markTaskDone(
+        taskId,
+        userId
+    ) {
+
         const query = `
         UPDATE tasks
         SET is_done = TRUE
@@ -109,14 +133,25 @@ export const taskRepository = {
         RETURNING *
     `
 
-        const values = [taskId, userId]
+        const values = [
+            taskId,
+            userId
+        ]
 
-        const result = await pool.query(query, values)
+        const result =
+            await pool.query(
+                query,
+                values
+            )
 
         return result.rows[0]
     },
 
-    async deleteTask(taskId, userId) {
+    async deleteTask(
+        taskId,
+        userId
+    ) {
+
         const query = `
         DELETE FROM tasks
         WHERE id = $1
@@ -124,9 +159,16 @@ export const taskRepository = {
         RETURNING *
     `
 
-        const values = [taskId, userId]
+        const values = [
+            taskId,
+            userId
+        ]
 
-        const result = await pool.query(query, values)
+        const result =
+            await pool.query(
+                query,
+                values
+            )
 
         return result.rows[0]
     },
@@ -136,6 +178,7 @@ export const taskRepository = {
         userId,
         title
     ) {
+
         const query = `
         UPDATE tasks
         SET title = $3
@@ -150,10 +193,11 @@ export const taskRepository = {
             title,
         ]
 
-        const result = await pool.query(
-            query,
-            values
-        )
+        const result =
+            await pool.query(
+                query,
+                values
+            )
 
         return result.rows[0]
     },
@@ -163,6 +207,7 @@ export const taskRepository = {
         userId,
         priority
     ) {
+
         const query = `
         UPDATE tasks
         SET priority = $3
@@ -177,10 +222,11 @@ export const taskRepository = {
             priority,
         ]
 
-        const result = await pool.query(
-            query,
-            values
-        )
+        const result =
+            await pool.query(
+                query,
+                values
+            )
 
         return result.rows[0]
     },
@@ -190,6 +236,7 @@ export const taskRepository = {
         userId,
         category
     ) {
+
         const query = `
         UPDATE tasks
         SET category = $3
@@ -204,10 +251,11 @@ export const taskRepository = {
             category,
         ]
 
-        const result = await pool.query(
-            query,
-            values
-        )
+        const result =
+            await pool.query(
+                query,
+                values
+            )
 
         return result.rows[0]
     }

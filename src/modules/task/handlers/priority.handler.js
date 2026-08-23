@@ -1,11 +1,17 @@
-import { userRepository } from '../../user/user.repository.js'
-import { taskService } from '../task.service.js'
-import { Markup } from 'telegraf'
+import { userRepository }
+    from '../../user/user.repository.js'
+import { taskService }
+    from '../task.service.js'
+import { Markup }
+    from 'telegraf'
 
 export async function handlePriorityByAction(
-    ctx,
-    taskId
+    ctx
 ) {
+
+    const taskId =
+        Number(ctx.match[1])
+
     await ctx.answerCbQuery()
 
     await ctx.reply(
@@ -34,11 +40,17 @@ export async function handlePriorityByAction(
 }
 
 export async function handleSetPriorityByAction(
-    ctx,
-    taskId,
-    priority
+    ctx
 ) {
-    const telegramId = ctx.from.id
+
+    const taskId =
+        Number(ctx.match[1])
+
+    const priority =
+        ctx.match[2]
+
+    const telegramId =
+        ctx.from.id
 
     const user =
         await userRepository.findByTelegramId(

@@ -1,18 +1,16 @@
-import { userRepository } from './user.repository.js'
+import { userRepository }
+    from './user.repository.js'
 
 export const userService = {
-    async ensureUserExists(ctx) {
-        const telegramUser = ctx.from
 
-        const user =
-            await userRepository.createUser({
-                telegramId: telegramUser.id,
-                username: telegramUser.username,
-                firstName: telegramUser.first_name,
-            })
+    async ensureUserExists(
+        telegramUser
+    ) {
 
-        console.log('Saved user:', user)
-
-        return user
+        return userRepository.createUser({
+            telegramId: telegramUser.id,
+            username: telegramUser.username,
+            firstName: telegramUser.first_name,
+        })
     }
 }

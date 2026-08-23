@@ -1,9 +1,14 @@
-import { createTaskSessions } from '../../../state/create-task.session.js'
-import {Markup} from "telegraf";
+import { createTaskSessions }
+    from '../../../state/create-task.session.js'
+import {Markup}
+    from "telegraf"
 
-export async function handleCreatePriority(ctx) {
+export async function handleCreatePriority(
+    ctx
+) {
 
-    const telegramId = ctx.from.id
+    const telegramId =
+        ctx.from.id
 
     const session =
         createTaskSessions.get(

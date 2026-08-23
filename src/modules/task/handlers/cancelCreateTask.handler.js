@@ -1,9 +1,14 @@
-import { createTaskSessions } from '../../../state/create-task.session.js'
-import {mainKeyboard} from "../../../keyboards/main.keyboard.js";
+import { createTaskSessions }
+    from '../../../state/create-task.session.js'
+import {mainKeyboard}
+    from "../../../keyboards/main.keyboard.js"
 
-export async function handleCancelCreateTask(ctx) {
+export async function handleCancelCreateTask(
+    ctx
+) {
 
-    const telegramId = ctx.from.id
+    const telegramId =
+        ctx.from.id
 
     const session =
         createTaskSessions.get(

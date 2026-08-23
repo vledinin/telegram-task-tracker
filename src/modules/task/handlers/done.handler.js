@@ -1,62 +1,94 @@
-import {userRepository} from "../../user/user.repository.js";
-import {taskService} from "../task.service.js";
+import {userRepository}
+    from "../../user/user.repository.js"
+import {taskService}
+    from "../task.service.js"
 
 export async function handleDoneByCommand(
     ctx
 ) {
-    const telegramId = ctx.from.id
 
-    const user = await userRepository.findByTelegramId(telegramId)
+    const telegramId =
+        ctx.from.id
+
+    const user =
+        await userRepository.findByTelegramId(
+            telegramId
+        )
 
     if (!user) {
-        return ctx.reply('User not found')
+        return ctx.reply(
+            'User not found'
+        )
     }
 
-    const taskId = ctx.message.text
-        .replace('/done', '')
-        .trim()
+    const taskId =
+        ctx.message.text
+            .replace(
+                '/done', ''
+            )
+            .trim()
 
     if (!taskId) {
-        return ctx.reply('Provide task id')
+        return ctx.reply(
+            'Provide task id'
+        )
     }
 
-    const task = await taskService.markTaskDone(
-        Number(taskId),
-        user.id
-    )
+    const task =
+        await taskService.markTaskDone(
+            Number(taskId),
+            user.id
+        )
 
     if (!task) {
-        return ctx.reply('Task not found')
+        return ctx.reply(
+            'Task not found'
+        )
     }
 
-    await ctx.reply(`Task completed: ${task.title}`)
+    await ctx.reply(
+        `Task completed: ${task.title}`
+    )
 }
 
 export async function handleDoneByAction(
-    ctx,
-    taskId
+    ctx
 ) {
 
-    const telegramId = ctx.from.id
+    const taskId =
+        Number(ctx.match[1])
 
-    const user = await userRepository.findByTelegramId(
-        telegramId
-    )
+    const telegramId =
+        ctx.from.id
+
+    const user =
+        await userRepository.findByTelegramId(
+            telegramId
+        )
 
     if (!user) {
-        return ctx.answerCbQuery('User not found')
+        return ctx.answerCbQuery(
+            'User not found'
+        )
     }
 
-    const task = await taskService.markTaskDone(
-        taskId,
-        user.id
-    )
+    const task =
+        await taskService.markTaskDone(
+            taskId,
+            user.id
+        )
 
     if (!task) {
-        return ctx.answerCbQuery('Task not found')
+        return ctx.answerCbQuery(
+            'Task not found'
+        )
     }
 
-    await ctx.answerCbQuery('Task completed')
+    await ctx.answerCbQuery(
+        'Task completed'
+    )
 
-    await ctx.editMessageText(`✅ ${task.title}`)
+    await ctx.editMessageText(
+        `✅ ${task.title}`
+    )
 }
