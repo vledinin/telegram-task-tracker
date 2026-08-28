@@ -24,6 +24,8 @@ import {handleCreateCategory}
     from "./handlers/createCategory.handler.js"
 import {handleCancelCreateTask}
     from "./handlers/cancelCreateTask.handler.js"
+import {handleCancelEdit}
+    from "./handlers/cancelEdit.handler.js"
 
 export function registerTaskModule(
     bot
@@ -63,16 +65,16 @@ export function registerTaskModule(
         handleCreateCategory
     )
 
-    // Cancel Create Task
-
-    bot.hears(
-        '❌ Cancel',
-        handleCancelCreateTask
-    )
+    // Cancel Create Task and Edit
 
     bot.action(
         'create_cancel',
         handleCancelCreateTask
+    )
+
+    bot.action(
+        'edit_cancel',
+        handleCancelEdit
     )
 
     // Task actions

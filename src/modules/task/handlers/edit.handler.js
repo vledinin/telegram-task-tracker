@@ -1,11 +1,15 @@
 import {editSessions}
     from "../../../state/edit.session.js"
+import { createTaskSessions }
+    from '../../../state/create-task.session.js'
 import {userRepository}
     from "../../user/user.repository.js"
 import {taskService}
     from "../task.service.js"
 import {mainKeyboard}
     from "../../../keyboards/main.keyboard.js"
+import {Markup}
+    from "telegraf";
 
 export async function handleEditByAction(
     ctx
@@ -17,6 +21,10 @@ export async function handleEditByAction(
     const telegramId =
         ctx.from.id
 
+    createTaskSessions.delete(
+        telegramId
+    )
+
     editSessions.set(
         telegramId,
         taskId
@@ -25,7 +33,15 @@ export async function handleEditByAction(
     await ctx.answerCbQuery()
 
     await ctx.reply(
-        'Send new task title'
+        'Send new task title',
+        Markup.inlineKeyboard([
+            [
+                Markup.button.callback(
+                    '❌ Cancel',
+                    'edit_cancel'
+                )
+            ],
+        ])
     )
 }
 

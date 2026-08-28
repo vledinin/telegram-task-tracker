@@ -1,9 +1,9 @@
 import { createTaskSessions }
     from '../../../state/create-task.session.js'
-import {Markup}
-    from "telegraf"
 import { TASK_TITLE_MIN_LENGTH, TASK_TITLE_MAX_LENGTH }
     from '../../../constants/validation.constants.js'
+import {Markup}
+    from "telegraf"
 
 export async function handleCreateTaskText(
     ctx
@@ -64,10 +64,14 @@ export async function handleCreateTaskText(
 
         await ctx.reply(
             'Enter due date (YYYY-MM-DD) or type "-" to skip:',
-
-            Markup.keyboard([
-                ['❌ Cancel']
-            ]).resize()
+            Markup.inlineKeyboard([
+                [
+                    Markup.button.callback(
+                        '❌ Cancel',
+                        'create_cancel'
+                    )
+                ],
+            ])
         )
 
         return true
