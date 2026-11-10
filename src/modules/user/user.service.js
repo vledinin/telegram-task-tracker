@@ -12,5 +12,13 @@ export const userService = {
             username: telegramUser.username,
             firstName: telegramUser.first_name,
         })
+    },
+
+    async findByTelegramId(
+        telegramId
+    ) {
+        return userRepository.findByTelegramId(
+            telegramId
+        )
     }
 }

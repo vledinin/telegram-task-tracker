@@ -2,10 +2,12 @@ import {editSessions}
     from "../../../state/edit.session.js"
 import { createTaskSessions }
     from '../../../state/create-task.session.js'
-import {userRepository}
-    from "../../user/user.repository.js"
+import { userService }
+    from '../../user/user.service.js'
 import {taskService}
     from "../task.service.js"
+import { validateTaskTitle }
+    from '../task.validation.js'
 import {mainKeyboard}
     from "../../../keyboards/main.keyboard.js"
 import {Markup}
@@ -67,7 +69,7 @@ export async function handleEditByText(
         )
 
     const user =
-        await userRepository.findByTelegramId(
+        await userService.findByTelegramId(
             telegramId
         )
 
@@ -77,13 +79,12 @@ export async function handleEditByText(
         )
     }
 
-    const newTitle =
-        ctx.message.text.trim()
+    let newTitle
 
-    if (!newTitle) {
-        return ctx.reply(
-            'Task title cannot be empty'
-        )
+    try {
+        newTitle = validateTaskTitle(ctx.message.text)
+    } catch (error) {
+        return ctx.reply(error.message)
     }
 
     const updatedTask =

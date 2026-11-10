@@ -21,9 +21,10 @@ export async function handleAddTask(
         )
     }
 
-    const taskText = ctx.message.text
-        .replace('/addtask', '')
-        .trim()
+    const taskText =
+        ctx.message.text
+            .replace('/addtask', '')
+            .trim()
 
     if (!taskText) {
         return ctx.reply(
@@ -31,85 +32,21 @@ export async function handleAddTask(
         )
     }
 
-    const [
-        titlePart,
-        dueDatePart,
-        priorityPart,
-        categoryPart,
-    ] = taskText.split('|')
+    try {
 
-    const title =
-        titlePart?.trim()
+        const task =
+            await taskService.createTaskFromCommand(
+                user.id,
+                taskText
+            )
 
-    const dueDate =
-        dueDatePart?.trim() || null
-
-    const priority =
-        priorityPart?.trim()
-            .toLowerCase()
-        || 'medium'
-
-    const category =
-        categoryPart?.trim()
-            .toLowerCase()
-        || 'other'
-
-    if (
-        dueDate &&
-        Number.isNaN(
-            Date.parse(dueDate)
+        await ctx.reply(
+            `Task created: ${task.title}`
         )
-    ) {
+
+    } catch (error) {
         return ctx.reply(
-            'Invalid date format. Use YYYY-MM-DD'
+            error.message
         )
     }
-
-    const allowedPriorities = [
-        'low',
-        'medium',
-        'high',
-    ]
-
-    if (
-        !allowedPriorities.includes(
-            priority
-        )
-    ) {
-        return ctx.reply(
-            'Priority must be low, medium or high'
-        )
-    }
-
-    const allowedCategories = [
-        'work',
-        'study',
-        'home',
-        'health',
-        'shopping',
-        'other',
-    ]
-
-    if (
-        !allowedCategories.includes(
-            category
-        )
-    ) {
-        return ctx.reply(
-            'Category must be work, study, home, health, shopping or other'
-        )
-    }
-
-    const task =
-        await taskService.createTask(
-            user.id,
-            title,
-            dueDate,
-            priority,
-            category
-        )
-
-    await ctx.reply(
-        `Task created: ${task.title}`
-    )
 }

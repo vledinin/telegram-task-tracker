@@ -1,7 +1,9 @@
 import { createTaskSessions }
     from '../../../state/create-task.session.js'
-import { TASK_TITLE_MIN_LENGTH, TASK_TITLE_MAX_LENGTH }
-    from '../../../constants/validation.constants.js'
+import { validateDueDate }
+    from '../task.service.js'
+import { validateTaskTitle }
+    from '../task.validation.js'
 import {Markup}
     from "telegraf"
 
@@ -23,38 +25,12 @@ export async function handleCreateTaskText(
 
     if (session.step === 'title') {
 
-        const title =
-            ctx.message.text.trim()
+        let title
 
-        if (!title) {
-            await ctx.reply(
-                'Task title cannot be empty.'
-            )
-
-            return true
-        }
-
-        if (title.length < TASK_TITLE_MIN_LENGTH) {
-            await ctx.reply(
-                'Task title must contain at least 3 characters.'
-            )
-
-            return true
-        }
-
-        if (title.length > TASK_TITLE_MAX_LENGTH) {
-            await ctx.reply(
-                'Task title cannot exceed 100 characters.'
-            )
-
-            return true
-        }
-
-        if (!/[a-zA-Zа-яА-ЯёЁ0-9]/.test(title)) {
-            await ctx.reply(
-                'Task title must contain at least one letter or number.'
-            )
-
+        try {
+            title = validateTaskTitle(ctx.message.text)
+        } catch (error) {
+            await ctx.reply(error.message)
             return true
         }
 
@@ -88,29 +64,14 @@ export async function handleCreateTaskText(
 
         } else {
 
-            if (!/^\d{4}-\d{2}-\d{2}$/.test(dueDate)) {
+            try {
+
+                validateDueDate(dueDate)
+
+            } catch (error) {
+
                 await ctx.reply(
-                    'Invalid date format.\n' +
-                    'Use YYYY-MM-DD or "-" to skip.'
-                )
-
-                return true
-            }
-
-            const date =
-                new Date(dueDate)
-
-            const [year, month, day] =
-                dueDate.split('-').map(Number)
-
-            if (
-                date.getFullYear() !== year ||
-                date.getMonth() + 1 !== month ||
-                date.getDate() !== day
-            ) {
-                await ctx.reply(
-                    'The specified date does not exist.\n' +
-                    'Please enter a valid calendar date.'
+                    error.message
                 )
 
                 return true
