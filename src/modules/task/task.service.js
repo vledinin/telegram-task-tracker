@@ -1,5 +1,7 @@
 import { taskRepository }
     from './task.repository.js'
+import { validateTaskTitle }
+    from './task.validation.js'
 import {
     allowedPriorities,
     allowedCategories,
@@ -59,9 +61,12 @@ export const taskService = {
         category = 'other'
     ) {
 
+        const validatedTitle =
+            validateTaskTitle(title)
+
         return taskRepository.createTask({
             userId,
-            title,
+            title: validatedTitle,
             dueDate,
             priority,
             category,
