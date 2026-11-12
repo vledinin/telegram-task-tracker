@@ -1,7 +1,7 @@
-import { userRepository }
-    from '../../user/user.repository.js'
 import { taskService }
     from '../task.service.js'
+import { userService }
+    from "../../user/user.service.js"
 import { Markup }
     from 'telegraf'
 
@@ -53,7 +53,7 @@ export async function handleSetPriorityByAction(
         ctx.from.id
 
     const user =
-        await userRepository.findByTelegramId(
+        await userService.findByTelegramId(
             telegramId
         )
 

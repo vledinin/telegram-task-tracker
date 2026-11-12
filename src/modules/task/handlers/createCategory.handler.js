@@ -1,10 +1,10 @@
 import { createTaskSessions }
     from '../../../state/create-task.session.js'
-import { userRepository }
-    from '../../user/user.repository.js'
 import { taskService }
     from '../task.service.js'
-import {mainKeyboard}
+import { userService }
+    from "../../user/user.service.js"
+import { mainKeyboard }
     from "../../../keyboards/main.keyboard.js"
 
 export async function handleCreateCategory(
@@ -33,7 +33,7 @@ export async function handleCreateCategory(
     // session.category = ctx.match[1]
 
     const user =
-        await userRepository.findByTelegramId(
+        await userService.findByTelegramId(
             telegramId
         )
 

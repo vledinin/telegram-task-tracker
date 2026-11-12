@@ -1,7 +1,7 @@
-import { userRepository }
-    from '../../user/user.repository.js'
 import { statisticsService }
     from '../statistics.service.js'
+import { userService }
+    from "../../user/user.service.js"
 import {
     buildPriorityStatisticsMessage,
     buildCategoryStatisticsMessage,
@@ -19,7 +19,7 @@ export async function handleStatisticsView(
         ctx.from.id
 
     const user =
-        await userRepository.findByTelegramId(
+        await userService.findByTelegramId(
             telegramId
         )
 

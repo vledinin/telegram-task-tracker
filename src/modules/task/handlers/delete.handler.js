@@ -1,7 +1,7 @@
-import {userRepository}
-    from "../../user/user.repository.js"
-import {taskService}
+import { taskService }
     from "../task.service.js"
+import { userService }
+    from "../../user/user.service.js"
 
 export async function handleDeleteByCommand(
     ctx
@@ -11,7 +11,7 @@ export async function handleDeleteByCommand(
         ctx.from.id
 
     const user =
-        await userRepository.findByTelegramId(
+        await userService.findByTelegramId(
             telegramId
         )
 
@@ -62,7 +62,7 @@ export async function handleDeleteByAction(
         ctx.from.id
 
     const user =
-        await userRepository.findByTelegramId(
+        await userService.findByTelegramId(
             telegramId
         )
 

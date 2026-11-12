@@ -1,8 +1,8 @@
-import {userRepository}
-    from "../../user/user.repository.js"
-import {taskService}
+import { taskService }
     from "../task.service.js"
-import {buildTasksKeyboard, buildTasksMessage}
+import { userService }
+    from "../../user/user.service.js"
+import { buildTasksKeyboard, buildTasksMessage }
     from "../task.utils.js"
 
 export async function handlePagination(
@@ -25,7 +25,7 @@ export async function handlePagination(
         ctx.from.id
 
     const user =
-        await userRepository.findByTelegramId(
+        await userService.findByTelegramId(
             telegramId
         )
 
