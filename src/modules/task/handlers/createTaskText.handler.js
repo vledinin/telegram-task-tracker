@@ -1,7 +1,7 @@
 import { createTaskSessions }
     from '../../../state/create-task.session.js'
 import { validateDueDate }
-    from '../task.service.js'
+    from '../task.validation.js'
 import { validateTaskTitle }
     from '../task.validation.js'
 import {Markup}

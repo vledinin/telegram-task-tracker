@@ -1,55 +1,11 @@
 import { taskRepository }
     from './task.repository.js'
-import { validateTaskTitle }
-    from './task.validation.js'
 import {
-    allowedPriorities,
-    allowedCategories,
-} from '../../constants/task.constants.js'
-
-export function validateDueDate(dueDate) {
-
-    if (!dueDate) {
-        return
-    }
-
-    const datePattern =
-        /^\d{4}-\d{2}-\d{2}$/
-
-    if (!datePattern.test(dueDate)) {
-        throw new Error(
-            'Invalid date format. Use YYYY-MM-DD'
-        )
-    }
-
-    const [
-        year,
-        month,
-        day,
-    ] = dueDate
-        .split('-')
-        .map(Number)
-
-    const date =
-        new Date(
-            Date.UTC(
-                year,
-                month - 1,
-                day
-            )
-        )
-
-    const isValidDate =
-        date.getUTCFullYear() === year &&
-        date.getUTCMonth() === month - 1 &&
-        date.getUTCDate() === day
-
-    if (!isValidDate) {
-        throw new Error(
-            'Invalid date format. Use YYYY-MM-DD'
-        )
-    }
-}
+    validateTaskTitle,
+    validateDueDate,
+    validateTaskCategory,
+    validateTaskPriority
+} from './task.validation.js'
 
 export const taskService = {
 
@@ -64,12 +20,21 @@ export const taskService = {
         const validatedTitle =
             validateTaskTitle(title)
 
+        const validatedDueDate =
+            validateDueDate(dueDate)
+
+        const validatedPriority =
+            validateTaskPriority(priority)
+
+        const validatedCategory =
+            validateTaskCategory(category)
+
         return taskRepository.createTask({
             userId,
             title: validatedTitle,
-            dueDate,
-            priority,
-            category,
+            dueDate: validatedDueDate,
+            priority: validatedPriority,
+            category: validatedCategory,
         })
     },
 
@@ -88,16 +53,8 @@ export const taskService = {
         const title =
             titlePart?.trim()
 
-        if (!title) {
-            throw new Error(
-                'Please provide task title'
-            )
-        }
-
         const dueDate =
             dueDatePart?.trim() || null
-
-        validateDueDate(dueDate)
 
         const priority =
             priorityPart?.trim()
@@ -108,26 +65,6 @@ export const taskService = {
             categoryPart?.trim()
                 .toLowerCase()
             || 'other'
-
-        if (
-            !allowedPriorities.includes(
-                priority
-            )
-        ) {
-            throw new Error(
-                'Priority must be low, medium or high'
-            )
-        }
-
-        if (
-            !allowedCategories.includes(
-                category
-            )
-        ) {
-            throw new Error(
-                'Category must be work, study, home, health, shopping or other'
-            )
-        }
 
         return this.createTask(
             userId,
