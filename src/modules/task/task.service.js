@@ -141,10 +141,14 @@ export const taskService = {
         title
     ) {
 
+        const validatedTitle =
+            validateTaskTitle(title)
+
+
         return taskRepository.updateTaskTitle(
             taskId,
             userId,
-            title
+            validatedTitle
         )
     },
 
