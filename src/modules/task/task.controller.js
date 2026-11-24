@@ -56,12 +56,12 @@ export function registerTaskModule(
     // Create Task
 
     bot.action(
-        /create_priority_(high|medium|low)/,
+        /^create_priority_(high|medium|low)$/,
         handleCreatePriority
     )
 
     bot.action(
-        /create_category_(.+)/,
+        /^create_category_(work|study|home|health|shopping|other)$/,
         handleCreateCategory
     )
 
@@ -112,7 +112,7 @@ export function registerTaskModule(
     )
 
     bot.action(
-        /^set_category_(\d+)_(.+)$/,
+        /^set_category_(\d+)_(work|study|home|health|shopping|other)$/,
         handleSetCategoryByAction
     )
 

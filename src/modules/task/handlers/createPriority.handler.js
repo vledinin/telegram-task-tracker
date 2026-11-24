@@ -25,9 +25,6 @@ export async function handleCreatePriority(
 
     session.priority = priority
 
-    // or
-    // session.priority = ctx.match[1]
-
     session.step = 'category'
 
     await ctx.answerCbQuery()

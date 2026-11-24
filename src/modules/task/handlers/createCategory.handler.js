@@ -29,9 +29,6 @@ export async function handleCreateCategory(
 
     session.category = category
 
-    // or
-    // session.category = ctx.match[1]
-
     const user =
         await userService.findByTelegramId(
             telegramId

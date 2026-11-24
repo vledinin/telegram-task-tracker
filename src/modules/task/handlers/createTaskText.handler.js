@@ -66,7 +66,8 @@ export async function handleCreateTaskText(
 
             try {
 
-                validateDueDate(dueDate)
+                session.dueDate =
+                    validateDueDate(dueDate)
 
             } catch (error) {
 
@@ -76,8 +77,6 @@ export async function handleCreateTaskText(
 
                 return true
             }
-
-            session.dueDate = dueDate
         }
 
         session.step = 'priority'

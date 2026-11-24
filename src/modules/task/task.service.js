@@ -154,10 +154,13 @@ export const taskService = {
         priority
     ) {
 
+        const validatedPriority =
+            validateTaskPriority(priority)
+
         return taskRepository.updateTaskPriority(
             taskId,
             userId,
-            priority
+            validatedPriority
         )
     },
 
@@ -167,10 +170,13 @@ export const taskService = {
         category
     ) {
 
+        const validatedCategory =
+            validateTaskCategory(category)
+
         return taskRepository.updateTaskCategory(
             taskId,
             userId,
-            category
+            validatedCategory
         )
     }
 }
