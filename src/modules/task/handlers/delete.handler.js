@@ -34,6 +34,12 @@ export async function handleDeleteByCommand(
         )
     }
 
+    if (!/^\d+$/.test(taskId)) {
+        return ctx.reply(
+            'Task id must be a number'
+        )
+    }
+
     const deletedTask =
         await taskService.deleteTask(
             Number(taskId),

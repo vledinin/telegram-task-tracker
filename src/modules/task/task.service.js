@@ -4,7 +4,10 @@ import {
     validateTaskTitle,
     validateDueDate,
     validateTaskCategory,
-    validateTaskPriority
+    validateTaskPriority,
+    validateTaskPage,
+    validateTaskFilter,
+    validateTaskId
 } from './task.validation.js'
 
 export const taskService = {
@@ -81,23 +84,29 @@ export const taskService = {
         filter = 'all'
     ) {
 
+        const validatedPage =
+            validateTaskPage(page)
+
+        const validatedFilter =
+            validateTaskFilter(filter)
+
         const limit = 5
 
         const offset =
-            (page - 1) * limit
+            (validatedPage - 1) * limit
 
         const tasks =
             await taskRepository.getUserTasks(
                 userId,
                 limit,
                 offset,
-                filter
+                validatedFilter
             )
 
         const totalTasks =
             await taskRepository.countUserTasks(
                 userId,
-                filter
+                validatedFilter
             )
 
         const totalPages =
@@ -109,7 +118,7 @@ export const taskService = {
             tasks,
             totalTasks,
             totalPages,
-            currentPage: page,
+            currentPage: validatedPage,
         }
     },
 
@@ -118,8 +127,11 @@ export const taskService = {
         userId
     ) {
 
+        const validatedTaskId =
+            validateTaskId(taskId)
+
         return taskRepository.markTaskDone(
-            taskId,
+            validatedTaskId,
             userId
         )
     },
@@ -129,8 +141,11 @@ export const taskService = {
         userId
     ) {
 
+        const validatedTaskId =
+            validateTaskId(taskId)
+
         return taskRepository.deleteTask(
-            taskId,
+            validatedTaskId,
             userId
         )
     },
@@ -141,12 +156,15 @@ export const taskService = {
         title
     ) {
 
+        const validatedTaskId =
+            validateTaskId(taskId)
+
         const validatedTitle =
             validateTaskTitle(title)
 
 
         return taskRepository.updateTaskTitle(
-            taskId,
+            validatedTaskId,
             userId,
             validatedTitle
         )
@@ -158,11 +176,14 @@ export const taskService = {
         priority
     ) {
 
+        const validatedTaskId =
+            validateTaskId(taskId)
+
         const validatedPriority =
             validateTaskPriority(priority)
 
         return taskRepository.updateTaskPriority(
-            taskId,
+            validatedTaskId,
             userId,
             validatedPriority
         )
@@ -174,11 +195,14 @@ export const taskService = {
         category
     ) {
 
+        const validatedTaskId =
+            validateTaskId(taskId)
+
         const validatedCategory =
             validateTaskCategory(category)
 
         return taskRepository.updateTaskCategory(
-            taskId,
+            validatedTaskId,
             userId,
             validatedCategory
         )

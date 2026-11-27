@@ -40,7 +40,7 @@ export function registerTaskModule(
 
     bot.command(
         'tasks',
-        showTasks
+        (ctx) => showTasks(ctx)
     )
 
     bot.command(

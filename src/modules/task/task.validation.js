@@ -113,3 +113,38 @@ export function validateTaskCategory(category) {
     return normalizedCategory
 }
 
+export function validateTaskPage(page) {
+    if (!Number.isInteger(page) || page < 1) {
+        throw new Error(
+            'Page must be a positive integer.'
+        )
+    }
+
+    return page
+}
+
+export function validateTaskFilter(filter) {
+    const allowedFilters = [
+        'all',
+        'active',
+        'done',
+    ]
+
+    if (!allowedFilters.includes(filter)) {
+        throw new Error(
+            'Filter must be all, active or done.'
+        )
+    }
+
+    return filter
+}
+
+export function validateTaskId(taskId) {
+    if (!Number.isInteger(taskId) || taskId < 1) {
+        throw new Error(
+            'Task id must be a positive integer.'
+        )
+    }
+
+    return taskId
+}

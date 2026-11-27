@@ -34,6 +34,12 @@ export async function handleDoneByCommand(
         )
     }
 
+    if (!/^\d+$/.test(taskId)) {
+        return ctx.reply(
+            'Task id must be a number'
+        )
+    }
+
     const task =
         await taskService.markTaskDone(
             Number(taskId),
